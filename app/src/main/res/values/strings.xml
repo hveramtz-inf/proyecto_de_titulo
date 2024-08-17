@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">proyecto_de_titulo</string>
+    <string name="title_activity_home">Home</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="cursos">Cursos</string>
+    <string name="cuestionarios">Cuestionarios</string>
+    <string name="calculadoras">Calculadoras</string>
+    <string-array name="cursos_titulos">
+        <item>Curso 1</item>
+        <item>Curso 2</item>
+        <item>Curso 3</item>
+    </string-array>
+</resources>
