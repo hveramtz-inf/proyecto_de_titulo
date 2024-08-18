@@ -24,13 +24,13 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="298dp"
+                android:layout_width="282dp"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
                 <EditText
                     android:id="@+id/buscadorCursos"
-                    android:layout_width="wrap_content"
+                    android:layout_width="246dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="40dp"
                     android:layout_weight="1"
@@ -47,10 +47,22 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:foreground="@drawable/baseline_search_24"
                 android:foregroundTint="@color/white"
-                android:orientation="horizontal"></LinearLayout>
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/button2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/transparente"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:textAlignment="viewStart"
+                    app:icon="@drawable/baseline_search_24"
+                    app:iconSize="35dp" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 

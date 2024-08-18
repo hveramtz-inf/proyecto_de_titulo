@@ -6,4 +6,5 @@
     <color name="transparente">#00000000</color>
     <color name="colorPrimary">#1D1D1B</color>
     <color name="colorPrimaryDark">#1D1D1B</color>
+    <color name="colorTarjeta1">#9ED6DF</color>
 </resources>

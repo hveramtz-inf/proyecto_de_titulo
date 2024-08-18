@@ -12,4 +12,9 @@
         <item>Curso 2</item>
         <item>Curso 3</item>
     </string-array>
+    <string-array name="cuestionarios">
+        <item>Cuestionario 1</item>
+        <item>Cuestionario 2</item>
+        <item>Cuestionario 3</item>
+    </string-array>
 </resources>
