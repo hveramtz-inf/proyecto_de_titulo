@@ -22,4 +22,9 @@
         android:name="com.example.proyecto_de_titulo.ui.Calculadoras.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_calculadoras" />
+    <fragment
+        android:id="@+id/navigation_favoritosCuestionarios"
+        android:name="com.example.proyecto_de_titulo.ui.favoritos.ListaFavoritos"
+        android:label="@string/Favoritos"
+        tools:layout="@layout/fragment_lista_favoritos" />
 </navigation>
