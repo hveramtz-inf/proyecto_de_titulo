@@ -1,5 +1,6 @@
 package com.example.proyecto_de_titulo.ui.Cuestionarios
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.proyecto_de_titulo.IntentarCuestionario
 import com.example.proyecto_de_titulo.R
 import com.example.proyecto_de_titulo.data.DataSeccionCuestionarios
 import com.example.proyecto_de_titulo.data.Datacuestionarios
@@ -89,7 +91,7 @@ class NestedCuestionariosAdapter(
 ) : RecyclerView.Adapter<NestedCuestionariosAdapter.NestedViewHolder>() {
 
     class NestedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val preguntaTextView: TextView = itemView.findViewById(R.id.numeroCuestionario)
+        val preguntaTextView: Button = itemView.findViewById(R.id.intentarCuestionario)
         val boton: Button = itemView.findViewById(R.id.guardarFavoritoCuestionario)
     }
 
@@ -102,6 +104,12 @@ class NestedCuestionariosAdapter(
     override fun onBindViewHolder(holder: NestedViewHolder, position: Int) {
         val pregunta = preguntas[position]
         holder.preguntaTextView.text = pregunta.id.toString()
+
+        holder.preguntaTextView.setOnClickListener {
+            val intent: Intent = Intent(holder.itemView.context, IntentarCuestionario::class.java)
+            intent.putExtra("idCuestionario", pregunta.id)
+            holder.itemView.context.startActivity(intent)
+        }
 
         // Set the button icon based on the favorite state
         if (pregunta.isFavorite) {

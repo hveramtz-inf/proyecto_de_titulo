@@ -48,7 +48,7 @@ class FavoritosAdapter(private val cuestionarios: List<Datacuestionarios>) :
     RecyclerView.Adapter<FavoritosAdapter.FavoritosViewHolder>() {
 
     class FavoritosViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val titulo: TextView = itemView.findViewById(R.id.numeroCuestionario)
+        val titulo: Button = itemView.findViewById(R.id.intentarCuestionario)
         val botonFavorito: Button = itemView.findViewById(R.id.guardarFavoritoCuestionario)
     }
 
@@ -60,7 +60,7 @@ class FavoritosAdapter(private val cuestionarios: List<Datacuestionarios>) :
 
     override fun onBindViewHolder(holder: FavoritosViewHolder, position: Int) {
         val cuestionario = cuestionarios[position]
-        holder.titulo.text = cuestionario.titulo
+        holder.titulo.text = cuestionario.id.toString()
 
         // Set the button icon based on the favorite state
         if (cuestionario.isFavorite) {

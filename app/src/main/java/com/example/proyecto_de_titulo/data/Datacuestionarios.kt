@@ -11,7 +11,18 @@ data class Datacuestionarios(
     val titulo: String,
     val lista_preguntas: List<DataPreguntas>,
     var isFavorite: Boolean = false,
-)
+) {
+    companion object {
+        fun getCuestionarioID(id:Int): Any {
+            return when (id) {
+                1 -> cuestionario1
+                2 -> cuestionario2
+                3 -> cuestionario3
+                else -> throw IllegalArgumentException("Cuestionario no encontrado")
+            }
+        }
+    }
+}
 
 data class DataPreguntas(
     val id: Int,
