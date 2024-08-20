@@ -43,7 +43,7 @@
             android:paddingStart="10dp">
 
             <Button
-                android:id="@+id/button"
+                android:id="@+id/botonSalir"
                 android:layout_width="132dp"
                 android:layout_height="match_parent"
                 android:width="10dp"
@@ -101,7 +101,7 @@
             android:padding="20dp">
 
             <Button
-                android:id="@+id/button3"
+                android:id="@+id/botonSiguientePregunta"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

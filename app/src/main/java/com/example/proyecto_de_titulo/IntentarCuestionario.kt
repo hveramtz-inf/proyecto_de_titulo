@@ -1,11 +1,13 @@
 package com.example.proyecto_de_titulo
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.RadioButton
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -34,12 +36,28 @@ class IntentarCuestionario : AppCompatActivity() {
         val Cuestionario = Datacuestionarios.getCuestionarioID(idCuestionario) as Datacuestionarios
         val pregunta = findViewById<TextView>(R.id.preguntaCuestionario)
         var preguntaActual = 0
+        val botonSiguiente = findViewById<Button>(R.id.botonSiguientePregunta)
+        val botonSalir = findViewById<Button>(R.id.botonSalir)
         pregunta.text = Cuestionario.lista_preguntas[preguntaActual].pregunta
 
 
         val listaRespuestas = Cuestionario.lista_preguntas[preguntaActual].lista_respuestas
         Log.d("IntentarCuestionario", "Lista de respuestas: $listaRespuestas")
 
+        botonSiguiente.setOnClickListener {
+            if (preguntaActual < Cuestionario.lista_preguntas.size - 1) {
+                preguntaActual++
+                pregunta.text = Cuestionario.lista_preguntas[preguntaActual].pregunta
+                val recyclerView = findViewById<RecyclerView>(R.id.listadoRespuestas)
+                recyclerView.layoutManager = LinearLayoutManager(this)
+                recyclerView.adapter = RespuestasAdapter(Cuestionario.lista_preguntas[preguntaActual].lista_respuestas)
+            }
+        }
+
+        botonSalir.setOnClickListener {
+            intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
 
         val recyclerView = findViewById<RecyclerView>(R.id.listadoRespuestas)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -47,7 +65,10 @@ class IntentarCuestionario : AppCompatActivity() {
     }
 }
 
+
 class RespuestasAdapter(private val respuestas: List<DataRespuestas>) : RecyclerView.Adapter<RespuestasAdapter.ViewHolder>() {
+    private var selectedPosition = -1
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val respuesta: RadioButton = view.findViewById(R.id.alternativa)
     }
@@ -57,8 +78,14 @@ class RespuestasAdapter(private val respuestas: List<DataRespuestas>) : Recycler
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         holder.respuesta.text = respuestas[position].respuesta
+        holder.respuesta.isChecked = position == selectedPosition
+
+        holder.respuesta.setOnClickListener {
+            selectedPosition = position
+            notifyDataSetChanged()
+        }
     }
 
     override fun getItemCount(): Int = respuestas.size
