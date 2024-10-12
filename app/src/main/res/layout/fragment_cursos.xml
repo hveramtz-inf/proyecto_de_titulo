@@ -67,6 +67,16 @@
         </LinearLayout>
     </LinearLayout>
 
+<Button
+    android:id="@+id/botonRetroceder"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Retroceder"
+    android:visibility="gone"
+    app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/listadoCursos"
         android:layout_width="0dp"
@@ -75,6 +85,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
+        app:layout_constraintTop_toBottomOf="@+id/botonRetroceder"
         tools:ignore="MissingConstraints" />
 </androidx.constraintlayout.widget.ConstraintLayout>

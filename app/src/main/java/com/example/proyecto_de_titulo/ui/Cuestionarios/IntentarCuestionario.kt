@@ -1,4 +1,4 @@
-package com.example.proyecto_de_titulo
+package com.example.proyecto_de_titulo.ui.Cuestionarios
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -16,6 +16,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.proyecto_de_titulo.MainActivity
+import com.example.proyecto_de_titulo.R
 import com.example.proyecto_de_titulo.data.DataRespuestas
 import com.example.proyecto_de_titulo.data.Datacuestionarios
 

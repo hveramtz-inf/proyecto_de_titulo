@@ -10,12 +10,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_de_titulo.R
+import com.example.proyecto_de_titulo.data.DataSeccionCursos
+import com.example.proyecto_de_titulo.data.dataCursos
+import com.example.proyecto_de_titulo.data.listaCursos
 import com.example.proyecto_de_titulo.databinding.FragmentCursosBinding
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentCursosBinding? = null
     private val binding get() = _binding!!
+    private lateinit var cursosAdapter: CursosAdapter
+    private var previousAdapter: RecyclerView.Adapter<*>? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,15 +32,21 @@ class HomeFragment : Fragment() {
         _binding = FragmentCursosBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        // Obtener el array de títulos de los recursos
-        val cursosTitulos = resources.getStringArray(R.array.cursos_titulos)
+        // Use the listaCursos from dataCursos.kt
+        cursosAdapter = CursosAdapter(listaCursos)
 
-        // Crear el adaptador con la lista de títulos de cursos
-        val adapter = CursosAdapter(cursosTitulos)
-
-        // Configurar el RecyclerView con un LayoutManager y el adaptador
+        // Configure the RecyclerView with a LayoutManager and the adapter
         binding.listadoCursos.layoutManager = LinearLayoutManager(context)
-        binding.listadoCursos.adapter = adapter
+        binding.listadoCursos.adapter = cursosAdapter
+
+        // Set up the back button
+        binding.botonRetroceder.setOnClickListener {
+            previousAdapter?.let {
+                binding.listadoCursos.adapter = it
+                previousAdapter = null
+                binding.botonRetroceder.visibility = View.GONE // Hide the back button
+            }
+        }
 
         return root
     }
@@ -44,25 +55,58 @@ class HomeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-}
 
+    inner class CursosAdapter(private val cursos: List<dataCursos>) :
+        RecyclerView.Adapter<CursosAdapter.CursoViewHolder>() {
 
-class CursosAdapter(private val cursosTitulos: Array<String>) :
-    RecyclerView.Adapter<CursosAdapter.CursoViewHolder>() {
+        inner class CursoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val cursoTitulo: TextView = itemView.findViewById(R.id.TituloCurso)
+        }
 
-    class CursoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val cursoTitulo: TextView = itemView.findViewById(R.id.TituloCurso)
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CursoViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.tarjeta_de_cursos, parent, false)
+            return CursoViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: CursoViewHolder, position: Int) {
+            val curso = cursos[position]
+            holder.cursoTitulo.text = curso.string
+            holder.cursoTitulo.setOnClickListener {
+                // Save the current adapter
+                previousAdapter = binding.listadoCursos.adapter
+
+                // Define the new adapter with the data you want to display
+                val nuevoAdapter = SeccionesAdapter(curso.lista_secciones)
+
+                // Replace the RecyclerView adapter
+                binding.listadoCursos.adapter = nuevoAdapter
+
+                // Make the back button visible
+                binding.botonRetroceder.visibility = View.VISIBLE
+            }
+        }
+
+        override fun getItemCount() = cursos.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CursoViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.tarjeta_de_cursos, parent, false)
-        return CursoViewHolder(view)
-    }
+    inner class SeccionesAdapter(private val secciones: List<DataSeccionCursos>) :
+        RecyclerView.Adapter<SeccionesAdapter.SeccionViewHolder>() {
 
-    override fun onBindViewHolder(holder: CursoViewHolder, position: Int) {
-        holder.cursoTitulo.text = cursosTitulos[position]
-    }
+        inner class SeccionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val seccionTitulo: TextView = itemView.findViewById(R.id.TituloCurso)
+        }
 
-    override fun getItemCount() = cursosTitulos.size
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SeccionViewHolder {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.tarjeta_de_cursos, parent, false)
+            return SeccionViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: SeccionViewHolder, position: Int) {
+            holder.seccionTitulo.text = secciones[position].titulo
+        }
+
+        override fun getItemCount() = secciones.size
+    }
 }

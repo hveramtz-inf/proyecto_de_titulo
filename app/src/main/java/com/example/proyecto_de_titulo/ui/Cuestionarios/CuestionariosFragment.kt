@@ -9,17 +9,14 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.proyecto_de_titulo.IntentarCuestionario
 import com.example.proyecto_de_titulo.R
 import com.example.proyecto_de_titulo.data.DataSeccionCuestionarios
 import com.example.proyecto_de_titulo.data.Datacuestionarios
 import com.example.proyecto_de_titulo.databinding.FragmentCuestionariosBinding
-import com.example.proyecto_de_titulo.ui.favoritos.ListaFavoritos
 
 class CuestionariosFragment : Fragment() {
 
