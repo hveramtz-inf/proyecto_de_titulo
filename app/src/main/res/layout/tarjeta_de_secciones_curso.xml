@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/text"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -30,7 +28,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="132dp"
+                    android:layout_height="match_parent"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -62,26 +60,6 @@
                             android:layout_weight="1"
                             app:srcCompat="@android:drawable/editbox_background" />
                     </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/barra_de_progreso"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <ProgressBar
-                        android:id="@+id/progressBar3"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="333dp"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/redondeo_progresbar"
-                        android:maxWidth="48dp"
-                        android:paddingStart="10dp"
-                        android:paddingTop="2dp"
-                        android:paddingEnd="10dp"
-                        android:paddingBottom="2dp" /> <!-- Ajusta este valor según sea necesario -->
                 </LinearLayout>
 
             </LinearLayout>

@@ -1,12 +1,15 @@
 package com.example.proyecto_de_titulo.ui.Cursos
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_de_titulo.R
@@ -14,6 +17,7 @@ import com.example.proyecto_de_titulo.data.DataSeccionCursos
 import com.example.proyecto_de_titulo.data.dataCursos
 import com.example.proyecto_de_titulo.data.listaCursos
 import com.example.proyecto_de_titulo.databinding.FragmentCursosBinding
+import com.example.proyecto_de_titulo.ui.Seccion.SeccionesFragment
 
 class HomeFragment : Fragment() {
 
@@ -99,12 +103,17 @@ class HomeFragment : Fragment() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SeccionViewHolder {
             val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.tarjeta_de_cursos, parent, false)
+                .inflate(R.layout.tarjeta_de_secciones_curso, parent, false)
             return SeccionViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: SeccionViewHolder, position: Int) {
-            holder.seccionTitulo.text = secciones[position].titulo
+            val seccion = secciones[position]
+            holder.seccionTitulo.text = seccion.titulo
+            holder.seccionTitulo.setOnClickListener {
+                val bundle = bundleOf("seccionId" to seccion.id)
+                findNavController().navigate(R.id.navigation_seccionCurso, bundle)
+            }
         }
 
         override fun getItemCount() = secciones.size
