@@ -7,11 +7,15 @@ import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.proyecto_de_titulo.R
 import com.example.proyecto_de_titulo.data.listaCursos
+import com.example.proyecto_de_titulo.ui.Apuntes.ApuntesFragment
 
 class SeccionesFragment : Fragment() {
     override fun onCreateView(
@@ -27,6 +31,7 @@ class SeccionesFragment : Fragment() {
         val titulo = view.findViewById<TextView>(R.id.tituloSeccion)
         val contenido = view.findViewById<TextView>(R.id.contenidoSeccion)
         val linkyoutube = view.findViewById<WebView>(R.id.videoSeccion)
+        val botonApuntes = view.findViewById<Button>(R.id.botonIrApunte)
 
         titulo.text = seccion?.titulo
         contenido.text = seccion?.contenido
@@ -50,7 +55,10 @@ class SeccionesFragment : Fragment() {
             val videoUrl = convertToEmbedUrl(seccion.linkyoutube)
             linkyoutube.loadUrl(videoUrl)
         }
-
+        botonApuntes.setOnClickListener {
+            val bundle = bundleOf("seccionId" to seccionId)
+            findNavController().navigate(R.id.navigation_apuntes, bundle)
+        }
         return view
     }
 

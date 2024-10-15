@@ -55,4 +55,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("jp.wasabeef:richeditor-android:2.0.0")
 }

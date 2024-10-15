@@ -32,4 +32,9 @@
         android:name="com.example.proyecto_de_titulo.ui.Seccion.SeccionesFragment"
         android:label="Seccion Curso"
         tools:layout="@layout/fragment_secciones" />
+    <fragment
+        android:id="@+id/navigation_apuntes"
+        android:name="com.example.proyecto_de_titulo.ui.Apuntes.ApuntesFragment"
+        android:label="fragment_apuntes"
+        tools:layout="@layout/fragment_apuntes" />
 </navigation>
