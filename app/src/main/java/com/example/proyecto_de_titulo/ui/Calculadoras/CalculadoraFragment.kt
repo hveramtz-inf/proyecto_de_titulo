@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,10 +42,12 @@ class CalculadoraFragment : Fragment() {
 
             findNavController().navigate(R.id.navigation_favoritosCuestionarios, bundle)
         }
-                val listadoCalculadora = root.findViewById<RecyclerView>(R.id.listadoCalculadoras)
+
+        val listadoCalculadora = root.findViewById<RecyclerView>(R.id.listadoCalculadoras)
         listadoCalculadora.layoutManager = LinearLayoutManager(context)
 
-        listadoCalculadora.adapter = CalculadoraAdapter(calculadorasList)
+        val navController = findNavController()
+        listadoCalculadora.adapter = CalculadoraAdapter(calculadorasList, navController)
 
         return root
     }
@@ -55,7 +58,10 @@ class CalculadoraFragment : Fragment() {
     }
 }
 
-class CalculadoraAdapter(private val items: List<DataCalculadoras>) : RecyclerView.Adapter<CalculadoraAdapter.ViewHolder>() {
+class CalculadoraAdapter(
+    private val items: List<DataCalculadoras>,
+    private val navController: NavController
+) : RecyclerView.Adapter<CalculadoraAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val nameTextView: TextView = view.findViewById(R.id.TituloCalculadora)
@@ -79,6 +85,12 @@ class CalculadoraAdapter(private val items: List<DataCalculadoras>) : RecyclerVi
             item.favorito = !item.favorito
             updateFavoriteIcon(holder.botonFavorito, item.favorito)
             Log.d("CalculadoraAdapter", "Item ${item.nombre} favorito: ${item.favorito}")
+        }
+
+        holder.itemView.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putInt("calculadoraId", item.id)
+            navController.navigate(R.id.navigation_usarCalculadoraFragment, bundle)
         }
     }
 

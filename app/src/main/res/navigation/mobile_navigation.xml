@@ -37,4 +37,9 @@
         android:name="com.example.proyecto_de_titulo.ui.Apuntes.ApuntesFragment"
         android:label="fragment_apuntes"
         tools:layout="@layout/fragment_apuntes" />
+    <fragment
+        android:id="@+id/navigation_usarCalculadoraFragment"
+        android:name="com.example.proyecto_de_titulo.ui.Calculadoras.UsarCalculadoraFragment"
+        android:label="fragment_usar_calculadora"
+        tools:layout="@layout/fragment_usar_calculadora" />
 </navigation>
