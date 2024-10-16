@@ -1,5 +1,8 @@
 package com.example.proyecto_de_titulo.data
 
+import android.os.Parcel
+import android.os.Parcelable
+
 data class DataSeccionCuestionarios(
     val id: Int,
     val titulo: String,
@@ -10,10 +13,36 @@ data class Datacuestionarios(
     val id: Int,
     val titulo: String,
     val lista_preguntas: List<DataPreguntas>,
-    var isFavorite: Boolean = false,
-) {
-    companion object {
-        fun getCuestionarioID(id:Int): Any {
+    var isFavorite: Boolean = false
+) : Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readInt(),
+        parcel.readString() ?: "",
+        parcel.createTypedArrayList(DataPreguntas.CREATOR) ?: emptyList(),
+        parcel.readByte() != 0.toByte()
+    )
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(id)
+        parcel.writeString(titulo)
+        parcel.writeTypedList(lista_preguntas)
+        parcel.writeByte(if (isFavorite) 1 else 0)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<Datacuestionarios> {
+        override fun createFromParcel(parcel: Parcel): Datacuestionarios {
+            return Datacuestionarios(parcel)
+        }
+
+        override fun newArray(size: Int): Array<Datacuestionarios?> {
+            return arrayOfNulls(size)
+        }
+
+        fun getCuestionarioID(id: Int): Any {
             return when (id) {
                 1 -> cuestionario1
                 2 -> cuestionario2
@@ -29,13 +58,67 @@ data class DataPreguntas(
     val pregunta: String,
     val tipo: String,
     val lista_respuestas: List<DataRespuestas>,
-)
+) : Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readInt(),
+        parcel.readString() ?: "",
+        parcel.readString() ?: "",
+        parcel.createTypedArrayList(DataRespuestas.CREATOR) ?: emptyList()
+    )
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(id)
+        parcel.writeString(pregunta)
+        parcel.writeString(tipo)
+        parcel.writeTypedList(lista_respuestas)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<DataPreguntas> {
+        override fun createFromParcel(parcel: Parcel): DataPreguntas {
+            return DataPreguntas(parcel)
+        }
+
+        override fun newArray(size: Int): Array<DataPreguntas?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
 
 data class DataRespuestas(
     val id: Int,
     val respuesta: String,
     val correcta: Boolean,
-)
+) : Parcelable {
+    constructor(parcel: Parcel) : this(
+        parcel.readInt(),
+        parcel.readString() ?: "",
+        parcel.readByte() != 0.toByte()
+    )
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(id)
+        parcel.writeString(respuesta)
+        parcel.writeByte(if (correcta) 1 else 0)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<DataRespuestas> {
+        override fun createFromParcel(parcel: Parcel): DataRespuestas {
+            return DataRespuestas(parcel)
+        }
+
+        override fun newArray(size: Int): Array<DataRespuestas?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
 
 // Ejemplo 1
 val cuestionario1 = Datacuestionarios(

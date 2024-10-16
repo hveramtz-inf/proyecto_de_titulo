@@ -17,6 +17,7 @@ import com.example.proyecto_de_titulo.R
 import com.example.proyecto_de_titulo.data.DataSeccionCuestionarios
 import com.example.proyecto_de_titulo.data.Datacuestionarios
 import com.example.proyecto_de_titulo.databinding.FragmentCuestionariosBinding
+import com.example.proyecto_de_titulo.ui.favoritos.ListaFavoritos
 
 class CuestionariosFragment : Fragment() {
 
@@ -42,7 +43,11 @@ class CuestionariosFragment : Fragment() {
         // Set up the button click listener
         val botonIrFavCuestionario: Button = binding.root.findViewById(R.id.botonIrFavCuestionario)
         botonIrFavCuestionario.setOnClickListener {
-            findNavController().navigate(R.id.navigation_favoritosCuestionarios)
+            val bundle = Bundle()
+            val cuestionariosFavoritos = cuestionariosViewModel.cuestionarios.value?.flatMap { it.lista_cuestionarios }?.filter { it.isFavorite } ?: emptyList()
+            bundle.putParcelableArrayList("cuestionarios", ArrayList(cuestionariosFavoritos))
+
+            findNavController().navigate(R.id.navigation_favoritosCuestionarios, bundle)
         }
 
         return root

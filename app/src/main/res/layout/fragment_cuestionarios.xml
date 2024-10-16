@@ -33,7 +33,7 @@
                     android:orientation="horizontal">
 
                     <EditText
-                        android:id="@+id/buscadorCuestionarios"
+                        android:id="@+id/buscadorCalculadoras"
                         android:layout_width="243dp"
                         android:layout_height="match_parent"
                         android:layout_marginStart="40dp"
@@ -57,7 +57,7 @@
                     android:orientation="horizontal">
 
                     <Button
-                        android:id="@+id/button2"
+                        android:id="@+id/bucarCuestionario"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
