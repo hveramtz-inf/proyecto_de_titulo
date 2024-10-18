@@ -42,4 +42,9 @@
         android:name="com.example.proyecto_de_titulo.ui.Calculadoras.UsarCalculadoraFragment"
         android:label="fragment_usar_calculadora"
         tools:layout="@layout/fragment_usar_calculadora" />
+    <fragment
+        android:id="@+id/navigation_historialCalculadora"
+        android:name="com.example.proyecto_de_titulo.ui.Calculadoras.HistorialCalculadoraFragment"
+        android:label="fragment_historial_calculadora"
+        tools:layout="@layout/fragment_historial_calculadora" />
 </navigation>

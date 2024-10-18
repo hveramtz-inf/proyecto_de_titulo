@@ -1,20 +1,26 @@
 package com.example.proyecto_de_titulo.ui.Calculadoras
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_de_titulo.R
 import com.example.proyecto_de_titulo.data.DataCalculadoras
+import com.example.proyecto_de_titulo.data.HistorialCalculadora
+import com.example.proyecto_de_titulo.data.Variable
 import com.example.proyecto_de_titulo.data.calculadorasList
+import net.objecthunter.exp4j.ExpressionBuilder
 
 class UsarCalculadoraFragment : Fragment() {
 
@@ -33,6 +39,14 @@ class UsarCalculadoraFragment : Fragment() {
         calculateButton = view.findViewById(R.id.botonCalcular)
         val Tituloformula: TextView = view.findViewById(R.id.TituloFormula)
 
+        val botonHistorial = view.findViewById<ImageView>(R.id.verHistorial)
+
+        botonHistorial.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putInt("calculadoraId", calculadoraId!!)
+            findNavController().navigate(R.id.navigation_historialCalculadora, bundle)
+            Log.d("UsarCalculadoraFragment", "Navigating to HistorialCalculadoraFragment with id $calculadoraId")
+        }
         // Recibir el calculadoraId
         calculadoraId = arguments?.getInt("calculadoraId")
 
@@ -43,6 +57,9 @@ class UsarCalculadoraFragment : Fragment() {
         if (calculadora != null) {
             val formula = calculadora!!.formula
             val variableNames = extraerVariablesDeFormula(formula)
+
+            // Limpiar la lista de variables antes de agregar nuevas variables
+            variables.clear()
 
             // Agregar variables a la lista
             for (variable in variableNames) {
@@ -59,11 +76,23 @@ class UsarCalculadoraFragment : Fragment() {
                 if (values.all { it != null }) {
                     // Realizar el cálculo con los valores ingresados
                     val result = calculate(formula, variableNames, values.filterNotNull())
+                    // Guardar en el historial
+                    val historial = HistorialCalculadora(
+                        formula = formula,
+                        idCalculadora = calculadoraId!!,
+                        resultado = result,
+                        variables = variables.toList()
+                    )
+                    HistorialCalculadora.addHistorial(historial)
                     // Mostrar el resultado (puedes usar un TextView o un Toast)
                     Toast.makeText(context, "Resultado: $result", Toast.LENGTH_LONG).show()
                 } else {
                     // Manejar el caso donde uno o más valores no son válidos
-                    Toast.makeText(context, "Por favor, ingrese todos los valores correctamente.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        context,
+                        "Por favor, ingrese todos los valores correctamente.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         } else {
@@ -84,18 +113,36 @@ class UsarCalculadoraFragment : Fragment() {
     }
 
     private fun calculate(formula: String, variables: List<String>, values: List<Double>): Double {
-        // Implementa tu lógica de cálculo aquí
-        // Ejemplo: para la fórmula "IMC = Peso / (Altura * Altura)"
         val variableMap = variables.zip(values).toMap()
-        return when (formula) {
-            "IMC = Peso / (Altura * Altura)" -> variableMap["Peso"]!! / (variableMap["Altura"]!! * variableMap["Altura"]!!)
-            "V = d / t" -> variableMap["d"]!! / variableMap["t"]!!
-            else -> 0.0 // Implementa otras fórmulas según sea necesario
+        var parsedFormula = formula
+
+        // Remove the left-hand side of the equation if present
+        if (parsedFormula.contains("=")) {
+            parsedFormula = parsedFormula.split("=").last().trim()
+        }
+
+        // Build the expression
+        val expressionBuilder = ExpressionBuilder(parsedFormula)
+        for ((variable, value) in variableMap) {
+            expressionBuilder.variable(variable)
+        }
+        val expression = expressionBuilder.build()
+
+        // Set variable values
+        for ((variable, value) in variableMap) {
+            expression.setVariable(variable, value)
+        }
+
+        // Evaluate the expression
+        return try {
+            expression.evaluate()
+        } catch (e: Exception) {
+            0.0
         }
     }
 }
 
-class VariablesAdapter(private val variables: List<Variable>) : RecyclerView.Adapter<VariablesAdapter.VariableViewHolder>() {
+class VariablesAdapter(private val variables: MutableList<Variable>) : RecyclerView.Adapter<VariablesAdapter.VariableViewHolder>() {
 
     class VariableViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val variableName: TextView = view.findViewById(R.id.variableName)
@@ -119,5 +166,3 @@ class VariablesAdapter(private val variables: List<Variable>) : RecyclerView.Ada
 
     override fun getItemCount(): Int = variables.size
 }
-
-data class Variable(val name: String, var value: Double?)

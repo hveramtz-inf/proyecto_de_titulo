@@ -1,6 +1,7 @@
 package com.example.proyecto_de_titulo.data
 import android.os.Parcel
 import android.os.Parcelable
+import android.util.Log
 
 data class DataCalculadoras(
     val id: Int,
@@ -61,3 +62,35 @@ val calculadora3 = DataCalculadoras(
 
 // Lista de ejemplos
 val calculadorasList = listOf(calculadora1, calculadora2, calculadora3)
+
+data class Variable(val name: String, var value: Double?)
+
+
+data class HistorialCalculadora(
+    val formula: String,
+    val idCalculadora: Int,
+    val resultado: Double,
+    val variables: List<Variable>
+) {
+    companion object {
+        private val historialMap = mutableMapOf<Int, MutableList<HistorialCalculadora>>()
+
+        fun addHistorial(historial: HistorialCalculadora) {
+            val historialList = historialMap.getOrPut(historial.idCalculadora) { mutableListOf() }
+            if (historialList.size >= 5) {
+                historialList.removeAt(0) // Remove the oldest entry if the list exceeds 5
+            }
+            historialList.add(historial)
+
+            // Log the added historial
+            Log.d("HistorialCalculadora", "Added historial: $historial")
+        }
+
+        fun getHistorial(idCalculadora: Int): List<HistorialCalculadora> {
+            val historial = historialMap[idCalculadora]?.toList() ?: emptyList()
+            // Log the retrieved historial
+            Log.d("HistorialCalculadora", "Retrieved historial for id $idCalculadora: $historial")
+            return historial
+        }
+    }
+}

@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.proyecto_de_titulo"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -39,7 +39,7 @@ android {
 }
 
 dependencies {
-
+    implementation("net.objecthunter:exp4j:0.4.8")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
