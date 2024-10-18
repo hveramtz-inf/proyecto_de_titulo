@@ -39,7 +39,7 @@ class HistorialCalculadoraFragment : Fragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_historial_calculadora, container, false)
         val recyclerView = view.findViewById<RecyclerView>(R.id.listadoHistorial)
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = HistorialCalculadoraAdapter(historial)
         return view
     }
@@ -69,7 +69,7 @@ class HistorialCalculadoraAdapter(private val historialList: List<HistorialCalcu
         holder.titutoFormula.text = historial.formula
         holder.tituloResultado.text = historial.resultado.toString()
 
-        // Configura el RecyclerView interno
+        // Configura el RecyclerView interno con un LinearLayoutManager vertical
         val variablesAdapter = VariablesAdapter1(historial.variables)
         holder.variablesRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context, LinearLayoutManager.HORIZONTAL, false)
         holder.variablesRecyclerView.adapter = variablesAdapter

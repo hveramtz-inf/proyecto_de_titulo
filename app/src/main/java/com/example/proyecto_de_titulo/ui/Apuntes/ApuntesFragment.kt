@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.proyecto_de_titulo.R
 import com.example.proyecto_de_titulo.data.Apuntes
 import com.example.proyecto_de_titulo.databinding.FragmentApuntesBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import jp.wasabeef.richeditor.RichEditor
 
 class ApuntesFragment : Fragment() {
 
@@ -52,6 +54,45 @@ class ApuntesFragment : Fragment() {
         val botonEliminar = root.findViewById<Button>(R.id.EliminarApunte)
         botonEliminar.setOnClickListener {
             eliminarApunte()
+        }
+
+        // Set up action buttons
+        // State variables for action buttons
+        var isBoldActive = false
+        var isItalicActive = false
+        var isUnderlineActive = false
+        var isBulletsActive = false
+        var isNumbersActive = false
+
+        // Set up action buttons
+        root.findViewById<Button>(R.id.action_bold).setOnClickListener {
+            isBoldActive = !isBoldActive
+            binding.editor.setBold()
+            Toast.makeText(context, if (isBoldActive) "Bold activated" else "Bold deactivated", Toast.LENGTH_SHORT).show()
+        }
+
+        root.findViewById<Button>(R.id.action_italic).setOnClickListener {
+            isItalicActive = !isItalicActive
+            binding.editor.setItalic()
+            Toast.makeText(context, if (isItalicActive) "Italic activated" else "Italic deactivated", Toast.LENGTH_SHORT).show()
+        }
+
+        root.findViewById<Button>(R.id.action_underline).setOnClickListener {
+            isUnderlineActive = !isUnderlineActive
+            binding.editor.setUnderline()
+            Toast.makeText(context, if (isUnderlineActive) "Underline activated" else "Underline deactivated", Toast.LENGTH_SHORT).show()
+        }
+
+        root.findViewById<Button>(R.id.action_bullets).setOnClickListener {
+            isBulletsActive = !isBulletsActive
+            binding.editor.setBullets()
+            Toast.makeText(context, if (isBulletsActive) "Bullets activated" else "Bullets deactivated", Toast.LENGTH_SHORT).show()
+        }
+
+        root.findViewById<Button>(R.id.action_numbers).setOnClickListener {
+            isNumbersActive = !isNumbersActive
+            binding.editor.setNumbers()
+            Toast.makeText(context, if (isNumbersActive) "Numbers activated" else "Numbers deactivated", Toast.LENGTH_SHORT).show()
         }
 
         cargarApunte()
