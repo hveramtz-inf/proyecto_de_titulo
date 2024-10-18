@@ -1,4 +1,5 @@
 package com.example.proyecto_de_titulo
+
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -13,11 +14,12 @@ class MainActivity : AppCompatActivity() {
             // Navegar a la actividad principal
             val intent = Intent(this, Home::class.java)
             startActivity(intent)
+            finish() // Finalizar MainActivity
         } else {
             // Navegar a la actividad de inicio de sesión
             val intent = Intent(this, inicia_sesion::class.java)
             startActivity(intent)
-            finish()
+            finish() // Finalizar MainActivity
         }
     }
 

@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -31,6 +33,7 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         val cursosViewModel = ViewModelProvider(this).get(CursosViewModel::class.java)
 
         _binding = FragmentCursosBinding.inflate(inflater, container, false)
@@ -50,6 +53,16 @@ class HomeFragment : Fragment() {
                 previousAdapter = null
                 binding.botonRetroceder.visibility = View.GONE // Hide the back button
             }
+        }
+
+        val buscadoCurso = binding.root.findViewById<EditText>(R.id.buscadorCursos)
+        val botonBuscar = binding.root.findViewById<Button>(R.id.bucarCursos)
+
+        botonBuscar.setOnClickListener {
+            val query = buscadoCurso.text.toString()
+            val filteredCursos = listaCursos.filter { it.string.contains(query, ignoreCase = true) }
+            cursosAdapter = CursosAdapter(filteredCursos)
+            binding.listadoCursos.adapter = cursosAdapter
         }
 
         return root
