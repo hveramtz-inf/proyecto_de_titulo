@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -48,6 +49,18 @@ class CalculadoraFragment : Fragment() {
 
         val navController = findNavController()
         listadoCalculadora.adapter = CalculadoraAdapter(calculadorasList, navController)
+
+        val buscadorCalculadora = binding.root.findViewById<EditText>(R.id.buscadorCalculadoras)
+        val botonBuscar = binding.root.findViewById<Button>(R.id.buscarCalculadora)
+
+        botonBuscar.setOnClickListener {
+            val busqueda = buscadorCalculadora.text.toString()
+            val calculadorasFiltradas = calculadorasList.filter {
+                it.nombre.contains(busqueda, ignoreCase = true)
+            }
+            listadoCalculadora.adapter = CalculadoraAdapter(calculadorasFiltradas, navController)
+        }
+
 
         return root
     }

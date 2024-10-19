@@ -76,6 +76,7 @@ class inicia_sesion : AppCompatActivity() {
         val editor: SharedPreferences.Editor = sharedPreferences.edit()
         editor.putString("RUT", rut)
         editor.putString("Contrasenia", contrasenia)
+        editor.putString("Nombre", "Nombre de usuario")
         editor.apply()
     }
 }

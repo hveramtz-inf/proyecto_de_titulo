@@ -34,6 +34,16 @@ class CuestionariosFragment : Fragment() {
         _binding = FragmentCuestionariosBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        val buscadorCalculadora = binding.root.findViewById<TextView>(R.id.buscadorCuestionario)
+        val botonBuscar = binding.root.findViewById<Button>(R.id.buscarCuestionario)
+
+        botonBuscar.setOnClickListener {
+            val cuestionariosFiltrados = cuestionariosViewModel.cuestionarios.value?.filter { it.titulo.contains(buscadorCalculadora.text) } ?: emptyList()
+            val adapter = CuestionariosAdapter(cuestionariosFiltrados)
+            binding.listadoCuestionarios.layoutManager = LinearLayoutManager(context)
+            binding.listadoCuestionarios.adapter = adapter
+        }
+
         cuestionariosViewModel.cuestionarios.observe(viewLifecycleOwner) { cuestionarios ->
             val adapter = CuestionariosAdapter(cuestionarios)
             binding.listadoCuestionarios.layoutManager = LinearLayoutManager(context)
