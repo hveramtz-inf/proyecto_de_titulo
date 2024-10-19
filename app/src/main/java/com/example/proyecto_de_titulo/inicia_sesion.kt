@@ -74,9 +74,10 @@ class inicia_sesion : AppCompatActivity() {
     private fun guardarCredenciales(rut: String, contrasenia: String) {
         val sharedPreferences: SharedPreferences = getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
         val editor: SharedPreferences.Editor = sharedPreferences.edit()
+        val Nombre = "Nombre de usuario"
         editor.putString("RUT", rut)
         editor.putString("Contrasenia", contrasenia)
-        editor.putString("Nombre", "Nombre de usuario")
+        editor.putString("Nombre", Nombre)
         editor.apply()
     }
 }
