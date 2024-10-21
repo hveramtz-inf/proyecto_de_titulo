@@ -101,9 +101,6 @@ class inicia_sesion : AppCompatActivity() {
        private fun guardarCredenciales(loginResponse: LoginResponse) {
         val sharedPreferences: SharedPreferences = getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
         val editor: SharedPreferences.Editor = sharedPreferences.edit()
-
-           Log.d("GuardarCredenciales", "Nombre: ${loginResponse.nombre}")
-
         editor.putString("RUT", loginResponse.rut)
         editor.putString("Contrasenia", loginResponse.contrasenia)
         editor.putString("Nombre", loginResponse.nombre)

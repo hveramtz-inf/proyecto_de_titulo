@@ -50,8 +50,9 @@ class SeccionesFragment : Fragment() {
             val videoUrl = convertToEmbedUrl(seccion.linkvideoyoutube)
             linkyoutube.loadUrl(videoUrl)
         }
+// SeccionesFragment.kt
         botonApuntes.setOnClickListener {
-            val bundle = bundleOf("seccionId" to seccion?.id)
+            val bundle = bundleOf("seccionId" to seccion?.id.toString())
             findNavController().navigate(R.id.navigation_apuntes, bundle)
         }
         return view
