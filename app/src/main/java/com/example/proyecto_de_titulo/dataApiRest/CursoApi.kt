@@ -1,8 +1,10 @@
 package com.example.proyecto_de_titulo.dataApiRest
 
+import java.util.UUID
+
 data class CursoApi(
-    val id: String, // UUID as String
+    val id: UUID, // Change id to UUID
     val nombre: String,
     val descripcion: String?,
-    val clavepucvid: String // UUID as String
+    val clavepucvid: UUID // Change clavepucvid to UUID
 )

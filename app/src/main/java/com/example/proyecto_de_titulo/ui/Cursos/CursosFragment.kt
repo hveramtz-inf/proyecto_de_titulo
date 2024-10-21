@@ -22,6 +22,7 @@ import retrofit2.Response
 import com.example.proyecto_de_titulo.dataApiRest.CursoApi
 import com.example.proyecto_de_titulo.dataApiRest.SeccionApi
 import com.example.proyecto_de_titulo.interfazApiRest.RetrofitClient
+import java.util.UUID
 
 class HomeFragment : Fragment() {
 
@@ -165,7 +166,7 @@ class HomeFragment : Fragment() {
                                     val secciones = response.body() ?: emptyList()
                                     Log.d("CursosFragment", "Secciones fetched: $secciones")
                                     // Filter secciones based on idcurso
-                                    val filteredSecciones = secciones.filter { it.idcurso == curso?.id }
+                                    val filteredSecciones = secciones.filter { UUID.fromString(it.idcurso) == curso?.id }
                                     // Define the new adapter with the filtered data
                                     val nuevoAdapter = SeccionesAdapter(filteredSecciones)
                                     // Replace the RecyclerView adapter
@@ -227,12 +228,11 @@ class HomeFragment : Fragment() {
                 val seccion = secciones[position]
                 holder.seccionTitulo.text = seccion?.titulo
                 holder.seccionTitulo.setOnClickListener {
-                    val bundle = bundleOf("seccionId" to seccion?.id)
+                    val bundle = bundleOf("seccion" to seccion)
                     findNavController().navigate(R.id.navigation_seccionCurso, bundle)
                 }
             }
         }
-
         override fun getItemCount() = secciones.size
 
         override fun getItemViewType(position: Int): Int {

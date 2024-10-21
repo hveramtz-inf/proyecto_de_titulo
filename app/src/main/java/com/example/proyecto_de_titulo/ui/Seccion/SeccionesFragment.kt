@@ -8,14 +8,12 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.proyecto_de_titulo.R
-import com.example.proyecto_de_titulo.data.listaCursos
-import com.example.proyecto_de_titulo.ui.Apuntes.ApuntesFragment
+import com.example.proyecto_de_titulo.dataApiRest.SeccionApi
 
 class SeccionesFragment : Fragment() {
     override fun onCreateView(
@@ -24,9 +22,7 @@ class SeccionesFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_secciones, container, false)
 
-        val seccionId = arguments?.getInt("seccionId")
-        val seccion = listaCursos.flatMap { it.lista_secciones }
-            .find { it.id == seccionId }
+        val seccion = arguments?.getParcelable<SeccionApi>("seccion")
 
         val titulo = view.findViewById<TextView>(R.id.tituloSeccion)
         val contenido = view.findViewById<TextView>(R.id.contenidoSeccion)
@@ -36,8 +32,7 @@ class SeccionesFragment : Fragment() {
         titulo.text = seccion?.titulo
         contenido.text = seccion?.contenido
 
-        if (seccion?.linkyoutube == null)
-        {
+        if (seccion?.linkvideoyoutube == null) {
             linkyoutube.visibility = View.INVISIBLE
         } else {
             linkyoutube.webViewClient = object : WebViewClient() {
@@ -52,18 +47,30 @@ class SeccionesFragment : Fragment() {
             linkyoutube.settings.mediaPlaybackRequiresUserGesture = false
 
             // Convert the YouTube URL to embed format
-            val videoUrl = convertToEmbedUrl(seccion.linkyoutube)
+            val videoUrl = convertToEmbedUrl(seccion.linkvideoyoutube)
             linkyoutube.loadUrl(videoUrl)
         }
         botonApuntes.setOnClickListener {
-            val bundle = bundleOf("seccionId" to seccionId)
+            val bundle = bundleOf("seccionId" to seccion?.id)
             findNavController().navigate(R.id.navigation_apuntes, bundle)
         }
         return view
     }
 
     private fun convertToEmbedUrl(youtubeUrl: String): String {
-        val videoId = youtubeUrl.split("v=")[1]
-        return "https://www.youtube.com/embed/$videoId?rel=0"
+        return when {
+            youtubeUrl.contains("youtube.com/shorts/") -> {
+                val videoId = youtubeUrl.split("youtube.com/shorts/")[1].split("?")[0]
+                "https://www.youtube.com/embed/$videoId?rel=0"
+            }
+            youtubeUrl.contains("v=") -> {
+                val videoId = youtubeUrl.split("v=")[1].split("&")[0]
+                "https://www.youtube.com/embed/$videoId?rel=0"
+            }
+            else -> {
+                // Handle other cases or return a default embed URL
+                "https://www.youtube.com/embed/"
+            }
+        }
     }
 }

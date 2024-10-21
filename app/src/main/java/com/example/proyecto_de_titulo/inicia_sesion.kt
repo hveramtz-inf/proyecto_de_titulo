@@ -6,9 +6,15 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import com.example.proyecto_de_titulo.dataApiRest.LoginRequest
+import com.example.proyecto_de_titulo.dataApiRest.LoginResponse
+import com.example.proyecto_de_titulo.interfazApiRest.RetrofitClient
+import retrofit2.Call
+import retrofit2.Response
 
 class inicia_sesion : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,11 +48,13 @@ class inicia_sesion : AppCompatActivity() {
             val rut = inputRut.text.toString()
             val contrasenia = inputContrasenia.text.toString()
 
-            // Aquí deberías validar las credenciales antes de guardarlas
-            if (validarCredenciales(rut, contrasenia)) {
-                guardarCredenciales(rut, contrasenia)
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
+            validarCredenciales(rut, contrasenia) { isValid ->
+                if (isValid) {
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    // Handle invalid credentials
+                }
             }
         }
     }
@@ -65,19 +73,42 @@ class inicia_sesion : AppCompatActivity() {
 
         return sb.toString()
     }
+    private fun validarCredenciales(rut: String, contrasenia: String, callback: (Boolean) -> Unit) {
+        val apiService = RetrofitClient.alumnoApiService
+        val loginRequest = LoginRequest(rut, contrasenia)
 
-    private fun validarCredenciales(rut: String, contrasenia: String): Boolean {
-        // Implementa la lógica de validación aquí
-        return true
+        apiService.IniciarSesion(loginRequest).enqueue(object : retrofit2.Callback<LoginResponse> {
+            override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                if (response.isSuccessful) {
+                    val loginResponse = response.body()
+                    if (loginResponse != null) {
+                        guardarCredenciales(loginResponse)
+                        callback(true)
+                    } else {
+                        callback(false)
+                    }
+                } else {
+                    callback(false)
+                }
+            }
+
+            override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                callback(false)
+            }
+        })
     }
 
-    private fun guardarCredenciales(rut: String, contrasenia: String) {
+       private fun guardarCredenciales(loginResponse: LoginResponse) {
         val sharedPreferences: SharedPreferences = getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
         val editor: SharedPreferences.Editor = sharedPreferences.edit()
-        val Nombre = "Nombre de usuario"
-        editor.putString("RUT", rut)
-        editor.putString("Contrasenia", contrasenia)
-        editor.putString("Nombre", Nombre)
+
+           Log.d("GuardarCredenciales", "Nombre: ${loginResponse.nombre}")
+
+        editor.putString("RUT", loginResponse.rut)
+        editor.putString("Contrasenia", loginResponse.contrasenia)
+        editor.putString("Nombre", loginResponse.nombre)
+        editor.putString("IdEstudiante", loginResponse.idestudiante?.toString() ?: "")
+        editor.putString("ClavePucvid", loginResponse.clavepucvid?.toString() ?: "")
         editor.apply()
     }
 }
