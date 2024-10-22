@@ -88,7 +88,8 @@
                             android:layout_weight="1"
                             android:background="@color/white"
                             android:indeterminateDrawable="@drawable/redondeo_progresbar"
-                            android:padding="10dp" />
+                            android:padding="10dp"
+                            android:max="100"/>
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

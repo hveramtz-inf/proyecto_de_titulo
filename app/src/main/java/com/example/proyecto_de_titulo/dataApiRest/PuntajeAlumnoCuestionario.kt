@@ -7,7 +7,7 @@ import android.os.Parcelable
 
 data class PuntajeAlumnoCuestionario(
     val id: UUID,
-    val idalumno: UUID,
+    val idestudiante: UUID,
     val idcuestionario: UUID,
     val puntaje: Float,
 )

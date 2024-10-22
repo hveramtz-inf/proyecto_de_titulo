@@ -3,6 +3,7 @@ package com.example.proyecto_de_titulo.ui.Cuestionarios
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -209,6 +210,7 @@ class NestedCuestionariosAdapter(
 
         // Set the progress based on the puntaje
         val puntaje = puntajes.find { it.idcuestionario == cuestionario.id }?.puntaje ?: 0f
+        Log.d("NestedCuestionariosAdapter", "Cuestionario ID: ${cuestionario.id}, Puntaje: $puntaje")
         holder.progressBar.progress = puntaje.toInt()
 
         holder.preguntaTextView.setOnClickListener {
