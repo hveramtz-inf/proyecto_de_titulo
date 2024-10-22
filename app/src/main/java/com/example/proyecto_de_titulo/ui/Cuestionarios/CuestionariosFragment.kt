@@ -1,11 +1,13 @@
 package com.example.proyecto_de_titulo.ui.Cuestionarios
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_de_titulo.R
 import com.example.proyecto_de_titulo.dataApiRest.CuestionarioApi
 import com.example.proyecto_de_titulo.dataApiRest.CursoApi
+import com.example.proyecto_de_titulo.dataApiRest.PuntajeAlumnoCuestionario
 import com.example.proyecto_de_titulo.databinding.FragmentCuestionariosBinding
 import com.example.proyecto_de_titulo.interfazApiRest.RetrofitClient
 import retrofit2.Call
@@ -45,8 +48,37 @@ class CuestionariosFragment : Fragment() {
 
         // Fetch cursos from API
         obtenerCursos()
+        obtenerPuntajeAlumno()
 
         return root
+    }
+
+        private fun obtenerPuntajeAlumno() {
+        val sharedPreferences = requireContext().getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
+        val idEstudiante = sharedPreferences.getString("IdEstudiante", null)
+
+        if (idEstudiante != null) {
+            val apiService = RetrofitClient.puntajeAlumnoCuestionarioApiService
+            apiService.getPuntajesByEstudiante(idEstudiante).enqueue(object : Callback<List<PuntajeAlumnoCuestionario>> {
+                override fun onResponse(call: Call<List<PuntajeAlumnoCuestionario>>, response: Response<List<PuntajeAlumnoCuestionario>>) {
+                    if (response.isSuccessful) {
+                        val puntajes = response.body()
+                        if (puntajes != null) {
+                            // Update the adapter with the new puntajes
+                            cuestionariosAdapter.updatePuntajes(puntajes)
+                        }
+                    } else {
+                        Toast.makeText(context, "Failed to load puntajes", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<List<PuntajeAlumnoCuestionario>>, t: Throwable) {
+                    Toast.makeText(context, "Error loading puntajes", Toast.LENGTH_SHORT).show()
+                }
+            })
+        } else {
+            Toast.makeText(context, "idAlumno not found in SharedPreferences", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun obtenerCursos() {
@@ -89,6 +121,7 @@ class CuestionariosAdapter(
 
     private val VIEW_TYPE_ITEM = 0
     private val VIEW_TYPE_LOADING = 1
+    private var puntajes: List<PuntajeAlumnoCuestionario> = emptyList()
 
     inner class CuestionarioViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val contenedorTituloCuestionario: TextView = itemView.findViewById(R.id.textView2)
@@ -121,7 +154,7 @@ class CuestionariosAdapter(
                     if (response.isSuccessful) {
                         val cuestionarios = response.body()
                         if (cuestionarios != null) {
-                            val nestedAdapter = NestedCuestionariosAdapter(cuestionarios)
+                            val nestedAdapter = NestedCuestionariosAdapter(cuestionarios, puntajes)
                             holder.listadoDeCuestionarios.layoutManager = LinearLayoutManager(holder.itemView.context, RecyclerView.HORIZONTAL, false)
                             holder.listadoDeCuestionarios.adapter = nestedAdapter
                         }
@@ -147,15 +180,21 @@ class CuestionariosAdapter(
         this.cursos = newCursos
         notifyDataSetChanged()
     }
+
+    fun updatePuntajes(newPuntajes: List<PuntajeAlumnoCuestionario>) {
+        this.puntajes = newPuntajes
+        notifyDataSetChanged()
+    }
 }
 
 class NestedCuestionariosAdapter(
-    private val cuestionarios: List<CuestionarioApi>
+    private val cuestionarios: List<CuestionarioApi>,
+    private val puntajes: List<PuntajeAlumnoCuestionario>
 ) : RecyclerView.Adapter<NestedCuestionariosAdapter.NestedViewHolder>() {
 
     class NestedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val preguntaTextView: Button = itemView.findViewById(R.id.intentarCuestionario)
-        val boton: Button = itemView.findViewById(R.id.guardarFavoritoCuestionario)
+        val progressBar: ProgressBar = itemView.findViewById(R.id.progressBar)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NestedViewHolder {
@@ -168,8 +207,12 @@ class NestedCuestionariosAdapter(
         val cuestionario = cuestionarios[position]
         holder.preguntaTextView.text = (position + 1).toString()
 
+        // Set the progress based on the puntaje
+        val puntaje = puntajes.find { it.idcuestionario == cuestionario.id }?.puntaje ?: 0f
+        holder.progressBar.progress = puntaje.toInt()
+
         holder.preguntaTextView.setOnClickListener {
-            val intent: Intent = Intent(holder.itemView.context, IntentarCuestionario::class.java)
+            val intent = Intent(holder.itemView.context, IntentarCuestionario::class.java)
             intent.putExtra("idCuestionario", cuestionario.id.toString())
             holder.itemView.context.startActivity(intent)
         }

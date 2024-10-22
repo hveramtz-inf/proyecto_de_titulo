@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.TextView
 import android.widget.Toast
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_de_titulo.MainActivity
 import com.example.proyecto_de_titulo.R
 import com.example.proyecto_de_titulo.dataApiRest.PreguntaApi
+import com.example.proyecto_de_titulo.dataApiRest.PreguntayRespuestaSeleccionadaEstudiante
 import com.example.proyecto_de_titulo.dataApiRest.RespuestaApi
 import com.example.proyecto_de_titulo.interfazApiRest.RetrofitClient
 import retrofit2.Call
@@ -28,9 +30,11 @@ class IntentarCuestionario : AppCompatActivity() {
     private lateinit var botonSiguiente: Button
     private lateinit var botonSalir: Button
     private lateinit var recyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
     private var preguntaActual = 0
     private var preguntas: List<PreguntaApi> = emptyList()
     private var respuestas: List<RespuestaApi> = emptyList()
+    private val respuestasSeleccionadas = mutableListOf<PreguntayRespuestaSeleccionadaEstudiante>()
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +45,7 @@ class IntentarCuestionario : AppCompatActivity() {
         botonSiguiente = findViewById(R.id.botonSiguientePregunta)
         botonSalir = findViewById(R.id.botonSalir)
         recyclerView = findViewById(R.id.listadoRespuestas)
+        progressBar = findViewById(R.id.progressBar)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         val idCuestionario = intent.getStringExtra("idCuestionario") ?: return
@@ -49,8 +54,12 @@ class IntentarCuestionario : AppCompatActivity() {
 
         botonSiguiente.setOnClickListener {
             if (preguntaActual < preguntas.size - 1) {
+                guardarRespuestaSeleccionada()
                 preguntaActual++
                 mostrarPregunta()
+            } else {
+                guardarRespuestaSeleccionada()
+                enviarRespuestasAFinalizarCuestionario(idCuestionario)
             }
         }
 
@@ -60,6 +69,7 @@ class IntentarCuestionario : AppCompatActivity() {
     }
 
     private fun obtenerPreguntasYRespuestas(idCuestionario: String) {
+        progressBar.visibility = View.VISIBLE
         val preguntaApiService = RetrofitClient.preguntaApiService
         val respuestaApiService = RetrofitClient.respuestaApiService
 
@@ -67,14 +77,19 @@ class IntentarCuestionario : AppCompatActivity() {
             override fun onResponse(call: Call<List<PreguntaApi>>, response: Response<List<PreguntaApi>>) {
                 if (response.isSuccessful) {
                     preguntas = response.body() ?: emptyList()
-                    mostrarPregunta()
+                    if (respuestas.isNotEmpty()) {
+                        mostrarPregunta()
+                        progressBar.visibility = View.GONE
+                    }
                 } else {
                     Toast.makeText(this@IntentarCuestionario, "Failed to load questions", Toast.LENGTH_SHORT).show()
+                    progressBar.visibility = View.GONE
                 }
             }
 
             override fun onFailure(call: Call<List<PreguntaApi>>, t: Throwable) {
                 Toast.makeText(this@IntentarCuestionario, "Error loading questions", Toast.LENGTH_SHORT).show()
+                progressBar.visibility = View.GONE
             }
         })
 
@@ -82,13 +97,19 @@ class IntentarCuestionario : AppCompatActivity() {
             override fun onResponse(call: Call<List<RespuestaApi>>, response: Response<List<RespuestaApi>>) {
                 if (response.isSuccessful) {
                     respuestas = response.body() ?: emptyList()
+                    if (preguntas.isNotEmpty()) {
+                        mostrarPregunta()
+                        progressBar.visibility = View.GONE
+                    }
                 } else {
                     Toast.makeText(this@IntentarCuestionario, "Failed to load answers", Toast.LENGTH_SHORT).show()
+                    progressBar.visibility = View.GONE
                 }
             }
 
             override fun onFailure(call: Call<List<RespuestaApi>>, t: Throwable) {
                 Toast.makeText(this@IntentarCuestionario, "Error loading answers", Toast.LENGTH_SHORT).show()
+                progressBar.visibility = View.GONE
             }
         })
     }
@@ -100,6 +121,26 @@ class IntentarCuestionario : AppCompatActivity() {
             val respuestasFiltradas = respuestas.filter { it.idpregunta == pregunta.id }
             recyclerView.adapter = RespuestasAdapter(respuestasFiltradas)
         }
+    }
+
+    private fun guardarRespuestaSeleccionada() {
+        val pregunta = preguntas[preguntaActual]
+        val respuestaSeleccionada = (recyclerView.adapter as RespuestasAdapter).getSelectedRespuesta()
+        if (respuestaSeleccionada != null) {
+            val respuestaEstudiante = PreguntayRespuestaSeleccionadaEstudiante(
+                pregunta = pregunta.pregunta,
+                respuesta = respuestaSeleccionada.respuesta,
+                valorRespuesta = respuestaSeleccionada.valor
+            )
+            respuestasSeleccionadas.add(respuestaEstudiante)
+        }
+    }
+
+    private fun enviarRespuestasAFinalizarCuestionario(idCuestionario: String) {
+        val intent = Intent(this, FinalizarCuestionario::class.java)
+        intent.putExtra("idCuestionario", idCuestionario)
+        intent.putParcelableArrayListExtra("respuestasSeleccionadas", ArrayList(respuestasSeleccionadas))
+        startActivity(intent)
     }
 }
 
@@ -126,4 +167,8 @@ class RespuestasAdapter(private val respuestas: List<RespuestaApi>) : RecyclerVi
     }
 
     override fun getItemCount(): Int = respuestas.size
+
+    fun getSelectedRespuesta(): RespuestaApi? {
+        return if (selectedPosition != -1) respuestas[selectedPosition] else null
+    }
 }

@@ -6,6 +6,7 @@ import com.example.proyecto_de_titulo.dataApiRest.CursoApi
 import com.example.proyecto_de_titulo.dataApiRest.LoginRequest
 import com.example.proyecto_de_titulo.dataApiRest.LoginResponse
 import com.example.proyecto_de_titulo.dataApiRest.PreguntaApi
+import com.example.proyecto_de_titulo.dataApiRest.PuntajeAlumnoCuestionario
 import com.example.proyecto_de_titulo.dataApiRest.ReqCreateApunteApi
 import com.example.proyecto_de_titulo.dataApiRest.RespuestaApi
 import com.example.proyecto_de_titulo.dataApiRest.SeccionApi
@@ -113,4 +114,25 @@ interface RespuestaApiService {
     @DELETE("respuestas/{id}")
     fun deleteRespuesta(@Path("id") id: String): Call<Void>
 }
+
+interface PuntajeAlumnoCuestionarioApiService {
+    @GET("puntajeCuestionario")
+    fun getPuntajes(): Call<List<PuntajeAlumnoCuestionario>>
+
+    @GET("puntajeCuestionario/{id}")
+    fun getPuntajeById(@Path("id") id: String): Call<PuntajeAlumnoCuestionario>
+
+    @GET("puntajeCuestionario/estudiante/{idestudiante}")
+    fun getPuntajesByEstudiante(@Path("idestudiante") idEstudiante: String): Call<List<PuntajeAlumnoCuestionario>>
+
+    @POST("puntajeCuestionario")
+    fun createPuntaje(@Body puntaje: PuntajeAlumnoCuestionario): Call<PuntajeAlumnoCuestionario>
+
+    @PUT("puntajeCuestionario/{id}")
+    fun updatePuntaje(@Path("id") id: String, @Body puntaje: PuntajeAlumnoCuestionario): Call<PuntajeAlumnoCuestionario>
+
+    @DELETE("puntajeCuestionario/{id}")
+    fun deletePuntaje(@Path("id") id: String): Call<Void>
+}
+
 
