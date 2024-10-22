@@ -3,72 +3,107 @@ package com.example.proyecto_de_titulo.ui.Cuestionarios
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.RadioButton
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_de_titulo.MainActivity
 import com.example.proyecto_de_titulo.R
-import com.example.proyecto_de_titulo.data.DataRespuestas
-import com.example.proyecto_de_titulo.data.Datacuestionarios
+import com.example.proyecto_de_titulo.dataApiRest.PreguntaApi
+import com.example.proyecto_de_titulo.dataApiRest.RespuestaApi
+import com.example.proyecto_de_titulo.interfazApiRest.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.util.UUID
 
-
-// In the IntentarCuestionario activity
 class IntentarCuestionario : AppCompatActivity() {
+    private lateinit var preguntaTextView: TextView
+    private lateinit var botonSiguiente: Button
+    private lateinit var botonSalir: Button
+    private lateinit var recyclerView: RecyclerView
+    private var preguntaActual = 0
+    private var preguntas: List<PreguntaApi> = emptyList()
+    private var respuestas: List<RespuestaApi> = emptyList()
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_intentar_cuestionario)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-        val idCuestionario = intent.getIntExtra("idCuestionario", -1)
-        val Cuestionario = Datacuestionarios.getCuestionarioID(idCuestionario) as Datacuestionarios
-        val pregunta = findViewById<TextView>(R.id.preguntaCuestionario)
-        var preguntaActual = 0
-        val botonSiguiente = findViewById<Button>(R.id.botonSiguientePregunta)
-        val botonSalir = findViewById<Button>(R.id.botonSalir)
-        pregunta.text = Cuestionario.lista_preguntas[preguntaActual].pregunta
 
+        preguntaTextView = findViewById(R.id.preguntaCuestionario)
+        botonSiguiente = findViewById(R.id.botonSiguientePregunta)
+        botonSalir = findViewById(R.id.botonSalir)
+        recyclerView = findViewById(R.id.listadoRespuestas)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
-        val listaRespuestas = Cuestionario.lista_preguntas[preguntaActual].lista_respuestas
-        Log.d("IntentarCuestionario", "Lista de respuestas: $listaRespuestas")
+        val idCuestionario = intent.getStringExtra("idCuestionario") ?: return
+
+        obtenerPreguntasYRespuestas(idCuestionario)
 
         botonSiguiente.setOnClickListener {
-            if (preguntaActual < Cuestionario.lista_preguntas.size - 1) {
+            if (preguntaActual < preguntas.size - 1) {
                 preguntaActual++
-                pregunta.text = Cuestionario.lista_preguntas[preguntaActual].pregunta
-                val recyclerView = findViewById<RecyclerView>(R.id.listadoRespuestas)
-                recyclerView.layoutManager = LinearLayoutManager(this)
-                recyclerView.adapter = RespuestasAdapter(Cuestionario.lista_preguntas[preguntaActual].lista_respuestas)
+                mostrarPregunta()
             }
         }
 
         botonSalir.setOnClickListener {
-            intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, MainActivity::class.java))
         }
+    }
 
-        val recyclerView = findViewById<RecyclerView>(R.id.listadoRespuestas)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = RespuestasAdapter(Cuestionario.lista_preguntas[preguntaActual].lista_respuestas)
+    private fun obtenerPreguntasYRespuestas(idCuestionario: String) {
+        val preguntaApiService = RetrofitClient.preguntaApiService
+        val respuestaApiService = RetrofitClient.respuestaApiService
+
+        preguntaApiService.getPreguntasByCuestionario(idCuestionario).enqueue(object : Callback<List<PreguntaApi>> {
+            override fun onResponse(call: Call<List<PreguntaApi>>, response: Response<List<PreguntaApi>>) {
+                if (response.isSuccessful) {
+                    preguntas = response.body() ?: emptyList()
+                    mostrarPregunta()
+                } else {
+                    Toast.makeText(this@IntentarCuestionario, "Failed to load questions", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<PreguntaApi>>, t: Throwable) {
+                Toast.makeText(this@IntentarCuestionario, "Error loading questions", Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        respuestaApiService.getRespuestas().enqueue(object : Callback<List<RespuestaApi>> {
+            override fun onResponse(call: Call<List<RespuestaApi>>, response: Response<List<RespuestaApi>>) {
+                if (response.isSuccessful) {
+                    respuestas = response.body() ?: emptyList()
+                } else {
+                    Toast.makeText(this@IntentarCuestionario, "Failed to load answers", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<RespuestaApi>>, t: Throwable) {
+                Toast.makeText(this@IntentarCuestionario, "Error loading answers", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun mostrarPregunta() {
+        if (preguntas.isNotEmpty()) {
+            val pregunta = preguntas[preguntaActual]
+            preguntaTextView.text = pregunta.pregunta
+            val respuestasFiltradas = respuestas.filter { it.idpregunta == pregunta.id }
+            recyclerView.adapter = RespuestasAdapter(respuestasFiltradas)
+        }
     }
 }
 
-
-class RespuestasAdapter(private val respuestas: List<DataRespuestas>) : RecyclerView.Adapter<RespuestasAdapter.ViewHolder>() {
+class RespuestasAdapter(private val respuestas: List<RespuestaApi>) : RecyclerView.Adapter<RespuestasAdapter.ViewHolder>() {
     private var selectedPosition = -1
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {

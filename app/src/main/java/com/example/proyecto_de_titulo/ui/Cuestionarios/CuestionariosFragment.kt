@@ -2,65 +2,79 @@ package com.example.proyecto_de_titulo.ui.Cuestionarios
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_de_titulo.R
-import com.example.proyecto_de_titulo.data.DataSeccionCuestionarios
-import com.example.proyecto_de_titulo.data.Datacuestionarios
+import com.example.proyecto_de_titulo.dataApiRest.CuestionarioApi
+import com.example.proyecto_de_titulo.dataApiRest.CursoApi
 import com.example.proyecto_de_titulo.databinding.FragmentCuestionariosBinding
-import com.example.proyecto_de_titulo.ui.favoritos.ListaFavoritos
+import com.example.proyecto_de_titulo.interfazApiRest.RetrofitClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class CuestionariosFragment : Fragment() {
 
     private var _binding: FragmentCuestionariosBinding? = null
     private val binding get() = _binding!!
+    private lateinit var cuestionariosAdapter: CuestionariosAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val cuestionariosViewModel = ViewModelProvider(this).get(CuestionariosViewModel::class.java)
-
         _binding = FragmentCuestionariosBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val buscadorCalculadora = binding.root.findViewById<TextView>(R.id.buscadorCuestionario)
-        val botonBuscar = binding.root.findViewById<Button>(R.id.buscarCuestionario)
+        // Initialize the adapter with an empty list
+        cuestionariosAdapter = CuestionariosAdapter(emptyList())
 
-        botonBuscar.setOnClickListener {
-            val cuestionariosFiltrados = cuestionariosViewModel.cuestionarios.value?.filter { it.titulo.contains(buscadorCalculadora.text) } ?: emptyList()
-            val adapter = CuestionariosAdapter(cuestionariosFiltrados)
-            binding.listadoCuestionarios.layoutManager = LinearLayoutManager(context)
-            binding.listadoCuestionarios.adapter = adapter
-        }
+        // Configure the RecyclerView with a LayoutManager and the adapter
+        binding.listadoCuestionarios.layoutManager = LinearLayoutManager(context)
+        binding.listadoCuestionarios.adapter = cuestionariosAdapter
 
-        cuestionariosViewModel.cuestionarios.observe(viewLifecycleOwner) { cuestionarios ->
-            val adapter = CuestionariosAdapter(cuestionarios)
-            binding.listadoCuestionarios.layoutManager = LinearLayoutManager(context)
-            binding.listadoCuestionarios.adapter = adapter
-        }
+        // Show the loading item before making the API call
+        showLoading()
 
-        // Set up the button click listener
-        val botonIrFavCuestionario: Button = binding.root.findViewById(R.id.botonIrFavCuestionario)
-        botonIrFavCuestionario.setOnClickListener {
-            val bundle = Bundle()
-            val cuestionariosFavoritos = cuestionariosViewModel.cuestionarios.value?.flatMap { it.lista_cuestionarios }?.filter { it.isFavorite } ?: emptyList()
-            bundle.putParcelableArrayList("cuestionarios", ArrayList(cuestionariosFavoritos))
-
-            findNavController().navigate(R.id.navigation_favoritosCuestionarios, bundle)
-        }
+        // Fetch cursos from API
+        obtenerCursos()
 
         return root
+    }
+
+    private fun obtenerCursos() {
+        val apiService = RetrofitClient.cursoApiService
+        apiService.getCursos().enqueue(object : Callback<List<CursoApi>> {
+            override fun onResponse(call: Call<List<CursoApi>>, response: Response<List<CursoApi>>) {
+                hideLoading()
+                if (response.isSuccessful) {
+                    val cursos = response.body() ?: emptyList()
+                    cuestionariosAdapter.updateData(cursos)
+                } else {
+                    Toast.makeText(context, "Failed to load courses", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<CursoApi>>, t: Throwable) {
+                hideLoading()
+                Toast.makeText(context, "Error loading courses", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun showLoading() {
+        cuestionariosAdapter.updateData(listOf(null))
+    }
+
+    private fun hideLoading() {
+        cuestionariosAdapter.updateData(emptyList())
     }
 
     override fun onDestroyView() {
@@ -70,36 +84,73 @@ class CuestionariosFragment : Fragment() {
 }
 
 class CuestionariosAdapter(
-    private val cuestionarios: List<DataSeccionCuestionarios>
-) : RecyclerView.Adapter<CuestionariosAdapter.CuestionarioViewHolder>() {
+    private var cursos: List<CursoApi?>
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    class CuestionarioViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    private val VIEW_TYPE_ITEM = 0
+    private val VIEW_TYPE_LOADING = 1
+
+    inner class CuestionarioViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val contenedorTituloCuestionario: TextView = itemView.findViewById(R.id.textView2)
         val listadoDeCuestionarios: RecyclerView = itemView.findViewById(R.id.listadoDeCuestionarios)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CuestionarioViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.titulo_y_cuestionarios, parent, false)
-        return CuestionarioViewHolder(view)
+    inner class LoadingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == VIEW_TYPE_ITEM) {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.titulo_y_cuestionarios, parent, false)
+            CuestionarioViewHolder(view)
+        } else {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.loading_item, parent, false)
+            LoadingViewHolder(view)
+        }
     }
 
-    override fun onBindViewHolder(holder: CuestionarioViewHolder, position: Int) {
-        val cuestionario = cuestionarios[position]
-        holder.contenedorTituloCuestionario.text = cuestionario.titulo
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (holder is CuestionarioViewHolder) {
+            val curso = cursos[position]
+            holder.contenedorTituloCuestionario.text = curso?.nombre
 
-        // Configura el RecyclerView anidado
-        val nestedAdapter = NestedCuestionariosAdapter(cuestionario.lista_cuestionarios)
-        holder.listadoDeCuestionarios.layoutManager = LinearLayoutManager(holder.itemView.context, RecyclerView.HORIZONTAL, false)
-        holder.listadoDeCuestionarios.adapter = nestedAdapter
+            // Llamada a la API para obtener los cuestionarios por curso
+            val apiService = RetrofitClient.cuestionarioApiService
+            apiService.getCuestionarios(curso?.id.toString()).enqueue(object : Callback<List<CuestionarioApi>> {
+                override fun onResponse(call: Call<List<CuestionarioApi>>, response: Response<List<CuestionarioApi>>) {
+                    if (response.isSuccessful) {
+                        val cuestionarios = response.body()
+                        if (cuestionarios != null) {
+                            val nestedAdapter = NestedCuestionariosAdapter(cuestionarios)
+                            holder.listadoDeCuestionarios.layoutManager = LinearLayoutManager(holder.itemView.context, RecyclerView.HORIZONTAL, false)
+                            holder.listadoDeCuestionarios.adapter = nestedAdapter
+                        }
+                    } else {
+                        Toast.makeText(holder.itemView.context, "Failed to load cuestionarios", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<List<CuestionarioApi>>, t: Throwable) {
+                    Toast.makeText(holder.itemView.context, "Error loading cuestionarios", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
     }
 
-    override fun getItemCount() = cuestionarios.size
+    override fun getItemCount() = cursos.size
+
+    override fun getItemViewType(position: Int): Int {
+        return if (cursos[position] == null) VIEW_TYPE_LOADING else VIEW_TYPE_ITEM
+    }
+
+    fun updateData(newCursos: List<CursoApi?>) {
+        this.cursos = newCursos
+        notifyDataSetChanged()
+    }
 }
 
-// Update NestedCuestionariosAdapter
 class NestedCuestionariosAdapter(
-    private val preguntas: List<Datacuestionarios>
+    private val cuestionarios: List<CuestionarioApi>
 ) : RecyclerView.Adapter<NestedCuestionariosAdapter.NestedViewHolder>() {
 
     class NestedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -114,38 +165,34 @@ class NestedCuestionariosAdapter(
     }
 
     override fun onBindViewHolder(holder: NestedViewHolder, position: Int) {
-        val pregunta = preguntas[position]
-        holder.preguntaTextView.text = pregunta.id.toString()
+        val cuestionario = cuestionarios[position]
+        holder.preguntaTextView.text = (position + 1).toString()
 
         holder.preguntaTextView.setOnClickListener {
             val intent: Intent = Intent(holder.itemView.context, IntentarCuestionario::class.java)
-            intent.putExtra("idCuestionario", pregunta.id)
+            intent.putExtra("idCuestionario", cuestionario.id.toString())
             holder.itemView.context.startActivity(intent)
         }
 
         // Set the button icon based on the favorite state
-        if (pregunta.isFavorite) {
+        /*if (cuestionario.isFavorite) {
             holder.boton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_favorite_50, 0, 0, 0)
-            Log.d("NestedCuestionariosAdapter", "Pregunta ${pregunta.id} isFavorite: true")
         } else {
             holder.boton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_favorite_border_50, 0, 0, 0)
-            Log.d("NestedCuestionariosAdapter", "Pregunta ${pregunta.id} isFavorite: false")
         }
 
         holder.boton.setOnClickListener {
             // Toggle the favorite state
-            pregunta.isFavorite = !pregunta.isFavorite
+            cuestionario.isFavorite = !cuestionario.isFavorite
 
             // Update the button icon
-            if (pregunta.isFavorite) {
-                holder.boton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_favorite_50, 0, 0, 0,)
-                Log.d("NestedCuestionariosAdapter", "Pregunta ${pregunta.id} marcada como favorita")
+            if (cuestionario.isFavorite) {
+                holder.boton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_favorite_50, 0, 0, 0)
             } else {
                 holder.boton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_favorite_border_50, 0, 0, 0)
-                Log.d("NestedCuestionariosAdapter", "Pregunta ${pregunta.id} desmarcada como favorita")
             }
-        }
+        }*/
     }
 
-    override fun getItemCount() = preguntas.size
+    override fun getItemCount() = cuestionarios.size
 }
