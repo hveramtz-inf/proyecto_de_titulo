@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!-- fragment_usar_calculadora.xml -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -86,14 +86,12 @@
                                     android:gravity="center"
                                     android:orientation="horizontal">
 
-                                    <TextView
+
+                                    <WebView
                                         android:id="@+id/TituloFormula"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:freezesText="false"
-                                        android:text="TextView"
-                                        android:textColor="#FDFDFD"
-                                        android:textSize="24sp" />
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="center" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
                         </LinearLayout>

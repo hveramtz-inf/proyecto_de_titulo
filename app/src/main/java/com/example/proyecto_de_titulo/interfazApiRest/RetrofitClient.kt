@@ -57,4 +57,8 @@ object RetrofitClient {
         retrofit.create(PuntajeAlumnoCuestionarioApiService::class.java)
     }
 
+    val calculadoraApiService: CalculadoraApiService by lazy {
+        retrofit.create(CalculadoraApiService::class.java)
+    }
+
 }

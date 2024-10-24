@@ -1,6 +1,7 @@
 package com.example.proyecto_de_titulo.interfazApiRest
 
 import com.example.proyecto_de_titulo.dataApiRest.ApuntesApi
+import com.example.proyecto_de_titulo.dataApiRest.CalculadoraApi
 import com.example.proyecto_de_titulo.dataApiRest.CuestionarioApi
 import com.example.proyecto_de_titulo.dataApiRest.CursoApi
 import com.example.proyecto_de_titulo.dataApiRest.LoginRequest
@@ -133,6 +134,23 @@ interface PuntajeAlumnoCuestionarioApiService {
 
     @DELETE("puntajeCuestionario/{id}")
     fun deletePuntaje(@Path("id") id: String): Call<Void>
+}
+
+interface CalculadoraApiService {
+    @GET("calculadoras")
+    fun getCalculadoras(): Call<List<CalculadoraApi>>
+
+    @GET("calculadoras/{id}")
+    fun getCalculadoraById(@Path("id") id: String): Call<CalculadoraApi>
+
+    @POST("calculadoras")
+    fun createCalculadora(@Body calculadora: CalculadoraApi): Call<CalculadoraApi>
+
+    @PUT("calculadoras/{id}")
+    fun updateCalculadora(@Path("id") id: String, @Body calculadora: CalculadoraApi): Call<CalculadoraApi>
+
+    @DELETE("calculadoras/{id}")
+    fun deleteCalculadora(@Path("id") id: String): Call<Void>
 }
 
 

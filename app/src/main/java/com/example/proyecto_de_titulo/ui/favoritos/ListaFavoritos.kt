@@ -53,7 +53,6 @@ class FavoritosAdapter(
     class FavoritosViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tituloCuestionario: Button? = itemView.findViewById(R.id.intentarCuestionario)
         val tituloCalculadoras: TextView? = itemView.findViewById(R.id.TituloCalculadora)
-        val formula: TextView? = itemView.findViewById(R.id.formula)
         val botonFavoritoCuestionario: Button? = itemView.findViewById(R.id.guardarFavoritoCuestionario)
         val botonFavoritoCalculadora: Button? = itemView.findViewById(R.id.guardarFavoritoCalculadora)
     }
@@ -81,7 +80,6 @@ class FavoritosAdapter(
         } else if (calculadoras != null) {
             val calculadora = calculadoras[position]
             holder.tituloCalculadoras?.text = calculadora.nombre
-            holder.formula?.text = calculadora.formula
 
             updateFavoriteIcon(holder.botonFavoritoCalculadora, calculadora.favorito)
             holder.botonFavoritoCalculadora?.setOnClickListener {
