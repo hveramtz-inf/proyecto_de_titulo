@@ -4,6 +4,7 @@ import com.example.proyecto_de_titulo.dataApiRest.ApuntesApi
 import com.example.proyecto_de_titulo.dataApiRest.CalculadoraApi
 import com.example.proyecto_de_titulo.dataApiRest.CuestionarioApi
 import com.example.proyecto_de_titulo.dataApiRest.CursoApi
+import com.example.proyecto_de_titulo.dataApiRest.HistorialCalculadoraApi
 import com.example.proyecto_de_titulo.dataApiRest.LoginRequest
 import com.example.proyecto_de_titulo.dataApiRest.LoginResponse
 import com.example.proyecto_de_titulo.dataApiRest.PreguntaApi
@@ -11,6 +12,7 @@ import com.example.proyecto_de_titulo.dataApiRest.PuntajeAlumnoCuestionario
 import com.example.proyecto_de_titulo.dataApiRest.ReqCreateApunteApi
 import com.example.proyecto_de_titulo.dataApiRest.RespuestaApi
 import com.example.proyecto_de_titulo.dataApiRest.SeccionApi
+import com.example.proyecto_de_titulo.dataApiRest.VariableHistorialApi
 import com.example.proyecto_de_titulo.dataApiRest.reqUpdateApunteApi
 import retrofit2.Call
 import retrofit2.http.Body
@@ -151,6 +153,51 @@ interface CalculadoraApiService {
 
     @DELETE("calculadoras/{id}")
     fun deleteCalculadora(@Path("id") id: String): Call<Void>
+}
+
+interface HistorialCalculadoraApiService {
+    @GET("historialCalculadora")
+    fun getHistorialCalculadoras(): Call<List<HistorialCalculadoraApi>>
+
+    @GET("historialCalculadora/{id}")
+    fun getHistorialCalculadoraById(@Path("id") id: String): Call<HistorialCalculadoraApi>
+
+    @GET("historialCalculadora/calculadora/{idcalculadora}/estudiante/{idestudiante}")
+    fun getHistorialCalculadoraByCalculadoraAndEstudiante(
+        @Path("idcalculadora") idCalculadora: String,
+        @Path("idestudiante") idEstudiante: String
+    ): Call<List<HistorialCalculadoraApi>>
+
+    @POST("historialCalculadora")
+    fun createHistorialCalculadora(@Body historialCalculadora: HistorialCalculadoraApi): Call<HistorialCalculadoraApi>
+
+    @PUT("historialCalculadora/{id}")
+    fun updateHistorialCalculadora(@Path("id") id: String, @Body historialCalculadora: HistorialCalculadoraApi): Call<HistorialCalculadoraApi>
+
+    @DELETE("historialCalculadora/{id}")
+    fun deleteHistorialCalculadora(@Path("id") id: String): Call<Void>
+}
+
+interface VariableHistorialApiService
+{
+    @GET("variableHistorial")
+    fun getVariableHistorial(): Call<List<VariableHistorialApi>>
+
+    @GET("variableHistorial/{id}")
+    fun getVariableHistorialById(@Path("id") id: String): Call<VariableHistorialApi>
+
+    @GET("variableHistorial/historial/{idhistorial}")
+    fun getVariableHistorialByHistorial(@Path("idhistorial") idHistorial: String): Call<List<VariableHistorialApi>>
+
+    @POST("variableHistorial")
+    fun createVariableHistorial(@Body variableHistorial: VariableHistorialApi): Call<VariableHistorialApi>
+
+    @PUT("variableHistorial/{id}")
+    fun updateVariableHistorial(@Path("id") id: String, @Body variableHistorial: VariableHistorialApi): Call<VariableHistorialApi>
+
+    @DELETE("variableHistorial/{id}")
+    fun deleteVariableHistorial(@Path("id") id: String): Call<Void>
+
 }
 
 

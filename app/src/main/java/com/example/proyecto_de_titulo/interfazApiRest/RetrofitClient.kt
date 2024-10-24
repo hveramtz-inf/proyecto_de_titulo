@@ -61,4 +61,12 @@ object RetrofitClient {
         retrofit.create(CalculadoraApiService::class.java)
     }
 
+    val historialCalculadoraApiService: HistorialCalculadoraApiService by lazy {
+        retrofit.create(HistorialCalculadoraApiService::class.java)
+    }
+
+    val variableHistorialApiService: VariableHistorialApiService by lazy {
+        retrofit.create(VariableHistorialApiService::class.java)
+    }
+
 }

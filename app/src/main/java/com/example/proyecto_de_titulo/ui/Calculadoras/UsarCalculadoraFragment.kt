@@ -1,6 +1,7 @@
 // UsarCalculadoraFragment.kt
 package com.example.proyecto_de_titulo.ui.Calculadoras
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,13 +15,22 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_de_titulo.R
 import com.example.proyecto_de_titulo.data.Variable
 import com.example.proyecto_de_titulo.dataApiRest.CalculadoraApi
+import com.example.proyecto_de_titulo.dataApiRest.HistorialCalculadoraApi
+import com.example.proyecto_de_titulo.dataApiRest.VariableHistorialApi
+import com.example.proyecto_de_titulo.interfazApiRest.RetrofitClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.objecthunter.exp4j.ExpressionBuilder
+import java.util.Date
+import java.util.UUID
 
 class UsarCalculadoraFragment : Fragment() {
 
@@ -70,25 +80,48 @@ class UsarCalculadoraFragment : Fragment() {
 
             // Manejar el botón de calcular
             calculateButton.setOnClickListener {
-                val values = variables.map { it.value }
-                if (values.all { it != null }) {
-                    // Realizar el cálculo con los valores ingresados
-                    val result =
-                        formula?.let { it1 -> variableNames?.let { it2 -> calculate(it1, it2.distinct(), values.filterNotNull()) } }
-                    // Guardar en el historial
-                    /*val historial = HistorialCalculadora(
-                        // Add necessary fields here
-                    )
-                    HistorialCalculadora.addHistorial(historial)
-                    // Mostrar el resultado (puedes usar un TextView o un Toast)*/
-                    Toast.makeText(context, "Resultado: $result", Toast.LENGTH_LONG).show()
-                } else {
-                    // Manejar el caso donde uno o más valores no son válidos
-                    Toast.makeText(
-                        context,
-                        "Por favor, ingrese todos los valores correctamente.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val values = variables.map { it.value }
+                    if (values.all { it != null }) {
+                        // Perform the calculation with the entered values
+                        val result = formula?.let { it1 -> variableNames?.let { it2 -> calculate(it1, it2.distinct(), values.filterNotNull()) } }
+
+                        // Retrieve IdEstudiante from SharedPreferences
+                        val sharedPreferences = requireContext().getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
+                        val idEstudiante = sharedPreferences.getString("IdEstudiante", null)?.let { UUID.fromString(it) }
+
+                        if (idEstudiante != null && calculadora != null) {
+                            // Create HistorialCalculadoraApi
+                            val historialCalculadora = HistorialCalculadoraApi(
+                                id = UUID.randomUUID(),
+                                idcalculadora = calculadora!!.id,
+                                idestudiante = idEstudiante,
+                                formulalatex = calculadora!!.latexformula ?: "",
+                                resultado = result ?: 0,
+                                created_at = Date()
+                            )
+                            val historialId = createHistorialCalculadora(historialCalculadora)
+
+                            // Create VariableHistorialApi for each variable
+                            if (historialId != null) {
+                                variables.forEach { variable ->
+                                    createVariableHistorial(variable, historialId)
+                                }
+                            }
+
+                            // Display the result (you can use a TextView or a Toast)
+                            Toast.makeText(context, "Resultado: $result", Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(context, "Error: IdEstudiante or Calculadora is null.", Toast.LENGTH_LONG).show()
+                        }
+                    } else {
+                        // Handle the case where one or more values are not valid
+                        Toast.makeText(
+                            context,
+                            "Por favor, ingrese todos los valores correctamente.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
         } else {
@@ -164,6 +197,34 @@ class UsarCalculadoraFragment : Fragment() {
             expression.evaluate()
         } catch (e: Exception) {
             0.0
+        }
+    }
+
+    private suspend fun createHistorialCalculadora(historialCalculadora: HistorialCalculadoraApi): UUID? {
+        return withContext(Dispatchers.IO) {
+            val call = RetrofitClient.historialCalculadoraApiService.createHistorialCalculadora(historialCalculadora)
+            val response = call.execute()
+            if (response.isSuccessful) {
+                response.body()?.id
+            } else {
+                Log.e("API Error", "Failed to create HistorialCalculadoraApi: ${response.errorBody()?.string()}")
+                null
+            }
+        }
+    }
+
+    private suspend fun createVariableHistorial(variable: Variable, historialId: UUID) {
+        val variableHistorial = VariableHistorialApi(
+            id = UUID.randomUUID(),
+            idhistorial = historialId,
+            variable = variable.name,
+            valor = variable.value!!
+        )
+        val response = withContext(Dispatchers.IO) {
+            RetrofitClient.variableHistorialApiService.createVariableHistorial(variableHistorial).execute()
+        }
+        if (!response.isSuccessful) {
+            Log.e("API Error", "Failed to create VariableHistorialApi: ${response.errorBody()?.string()}")
         }
     }
 }
