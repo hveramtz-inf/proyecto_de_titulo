@@ -68,7 +68,7 @@ class FinalizarCuestionario : AppCompatActivity() {
                     val puntajeExistente = puntajes?.find { it.idcuestionario.toString() == idCuestionario }
 
                     if (puntajeExistente != null) {
-                        if (porcentajeRespuestasCorrectas > puntajeExistente.puntaje) {
+                        if (porcentajeRespuestasCorrectas > puntajeExistente.puntaje && puntajeExistente.puntaje.toInt() != 100) {
                             actualizarPuntaje(puntajeExistente.id.toString(), idCuestionario, porcentajeRespuestasCorrectas)
                         }
                     } else {

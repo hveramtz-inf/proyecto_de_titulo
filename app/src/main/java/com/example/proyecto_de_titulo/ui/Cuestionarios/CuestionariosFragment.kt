@@ -211,6 +211,7 @@ class NestedCuestionariosAdapter(
         // Set the progress based on the puntaje
         val puntaje = puntajes.find { it.idcuestionario == cuestionario.id }?.puntaje ?: 0f
         Log.d("NestedCuestionariosAdapter", "Cuestionario ID: ${cuestionario.id}, Puntaje: $puntaje")
+        holder.progressBar.max = 100
         holder.progressBar.progress = puntaje.toInt()
 
         holder.preguntaTextView.setOnClickListener {
