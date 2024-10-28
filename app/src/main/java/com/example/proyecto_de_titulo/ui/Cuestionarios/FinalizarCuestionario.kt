@@ -2,7 +2,9 @@ package com.example.proyecto_de_titulo.ui.Cuestionarios
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +12,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -39,7 +42,7 @@ class FinalizarCuestionario : AppCompatActivity() {
 
         // Set the text for respuestasCorrectas_de_total TextView
         val respuestasCorrectasTextView: TextView = findViewById(R.id.respuestasCorrectas_de_total)
-        val numeroRespuestasCorrectas = preguntayrespuestas?.count { it.valorRespuesta } ?: 0
+        val numeroRespuestasCorrectas = preguntayrespuestas?.count { it.valor } ?: 0
         val totalPreguntas = preguntayrespuestas?.size ?: 0
         respuestasCorrectasTextView.text = "$numeroRespuestasCorrectas de $totalPreguntas"
 
@@ -138,7 +141,7 @@ fun calcularPorcentajeRespuestasCorrectas(preguntayrespuestas: List<PreguntayRes
     var respuestasCorrectas = 0
 
     for (preguntaRespuesta in preguntayrespuestas) {
-        if (preguntaRespuesta.valorRespuesta) {
+        if (preguntaRespuesta.valor) {
             respuestasCorrectas++
         }
     }
@@ -150,16 +153,14 @@ fun calcularPorcentajeRespuestasCorrectas(preguntayrespuestas: List<PreguntayRes
     }
 }
 
-
 class ListadoPreguntayRespuestaAdapter(
-    preguntayrespuestas: List<PreguntayRespuestaSeleccionadaEstudiante>
+    private val preguntayrespuestas: List<PreguntayRespuestaSeleccionadaEstudiante>
 ) : RecyclerView.Adapter<ListadoPreguntayRespuestaAdapter.ViewHolder>() {
-
-    private val respuestasIncorrectas = preguntayrespuestas.filter { !it.valorRespuesta }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tituloPregunta: TextView = itemView.findViewById(R.id.TituloPreguntaFinales)
         val tituloRespuesta: TextView = itemView.findViewById(R.id.TituloRepuestaFinales)
+        val tarjetaPreguntaYRespuesta: CardView = itemView.findViewById(R.id.tarjetaPreguntaYRespuesta)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -169,10 +170,20 @@ class ListadoPreguntayRespuestaAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = respuestasIncorrectas[position]
+        val item = preguntayrespuestas[position]
         holder.tituloPregunta.text = item.pregunta
         holder.tituloRespuesta.text = item.respuesta
+
+        // Log the content of preguntayrespuestas
+        Log.d("ListadoPreguntayRespuestaAdapter", "Pregunta: ${item.pregunta}, Respuesta: ${item.respuesta}, Valor: ${item.valor}")
+
+        // Change the card color based on the answer value
+        if (item.valor) {
+            holder.tarjetaPreguntaYRespuesta.setCardBackgroundColor(Color.parseColor("#62da5e")) // Green color
+        } else {
+            holder.tarjetaPreguntaYRespuesta.setCardBackgroundColor(Color.parseColor("#da5e5e")) // Red color
+        }
     }
 
-    override fun getItemCount() = respuestasIncorrectas.size
+    override fun getItemCount() = preguntayrespuestas.size
 }

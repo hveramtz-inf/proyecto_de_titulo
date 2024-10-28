@@ -130,7 +130,7 @@ class IntentarCuestionario : AppCompatActivity() {
             val respuestaEstudiante = PreguntayRespuestaSeleccionadaEstudiante(
                 pregunta = pregunta.pregunta,
                 respuesta = respuestaSeleccionada.respuesta,
-                valorRespuesta = respuestaSeleccionada.valor
+                valor = respuestaSeleccionada.valor
             )
             respuestasSeleccionadas.add(respuestaEstudiante)
         }

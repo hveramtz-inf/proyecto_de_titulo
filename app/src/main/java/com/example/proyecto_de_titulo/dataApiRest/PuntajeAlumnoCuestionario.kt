@@ -18,7 +18,7 @@ data class PuntajeAlumnoCuestionario(
 data class PreguntayRespuestaSeleccionadaEstudiante(
     val pregunta: String,
     val respuesta: String,
-    val valorRespuesta: Boolean
+    val valor: Boolean
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString() ?: "",
@@ -29,7 +29,7 @@ data class PreguntayRespuestaSeleccionadaEstudiante(
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(pregunta)
         parcel.writeString(respuesta)
-        parcel.writeByte(if (valorRespuesta) 1 else 0)
+        parcel.writeByte(if (valor) 1 else 0)
     }
 
     override fun describeContents(): Int {
