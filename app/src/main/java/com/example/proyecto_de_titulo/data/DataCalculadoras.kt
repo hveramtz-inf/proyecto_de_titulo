@@ -86,11 +86,11 @@ data class HistorialCalculadora(
             Log.d("HistorialCalculadora", "Added historial: $historial")
         }
 
-        fun getHistorial(idCalculadora: Int): List<HistorialCalculadora> {
+        /*fun getHistorial(idCalculadora: String): List<HistorialCalculadora> {
             val historial = historialMap[idCalculadora]?.toList() ?: emptyList()
             // Log the retrieved historial
             Log.d("HistorialCalculadora", "Retrieved historial for id $idCalculadora: $historial")
             return historial
-        }
+        }*/
     }
 }

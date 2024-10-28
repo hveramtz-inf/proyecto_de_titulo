@@ -1,4 +1,3 @@
-// CalculadoraApi.kt
 package com.example.proyecto_de_titulo.dataApiRest
 
 import android.os.Parcel
@@ -27,14 +26,6 @@ data class CalculadoraApi(
 
     override fun describeContents(): Int = 0
 
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + (nombre?.hashCode() ?: 0)
-        result = 31 * result + (formula?.hashCode() ?: 0)
-        result = 31 * result + (latexformula?.hashCode() ?: 0)
-        return result
-    }
-
     companion object CREATOR : Parcelable.Creator<CalculadoraApi> {
         override fun createFromParcel(parcel: Parcel): CalculadoraApi {
             return CalculadoraApi(parcel)
@@ -45,3 +36,28 @@ data class CalculadoraApi(
         }
     }
 }
+
+// Examples of CalculadoraApi
+val calculadora1 = CalculadoraApi(
+    id = UUID.randomUUID(),
+    nombre = "Calculadora de Área",
+    formula = "A = l * w",
+    latexformula = null
+)
+
+val calculadora2 = CalculadoraApi(
+    id = UUID.randomUUID(),
+    nombre = "Calculadora de Volumen",
+    formula = "V = l * w * h",
+    latexformula = null
+)
+
+val calculadora3 = CalculadoraApi(
+    id = UUID.randomUUID(),
+    nombre = "Calculadora de Velocidad",
+    formula = "v = d / t",
+    latexformula = null
+)
+
+// List of examples
+val calculadorasList = listOf(calculadora1, calculadora2, calculadora3)

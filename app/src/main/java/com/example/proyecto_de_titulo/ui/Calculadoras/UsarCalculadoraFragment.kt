@@ -1,4 +1,3 @@
-// UsarCalculadoraFragment.kt
 package com.example.proyecto_de_titulo.ui.Calculadoras
 
 import android.content.Context
@@ -11,6 +10,7 @@ import android.webkit.WebView
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
@@ -37,6 +37,9 @@ class UsarCalculadoraFragment : Fragment() {
     private lateinit var variablesRecyclerView: RecyclerView
     private lateinit var calculateButton: Button
     private lateinit var tituloFormula: WebView
+    private lateinit var resultadoTextView: TextView
+    private lateinit var textoFormulaConValores: TextView
+    private lateinit var layoutTextoFormulayTextoResultado: LinearLayout
     private var calculadora: CalculadoraApi? = null
     private val variables = mutableListOf<Variable>()
 
@@ -48,15 +51,18 @@ class UsarCalculadoraFragment : Fragment() {
         variablesRecyclerView = view.findViewById(R.id.listadoDeVariables)
         calculateButton = view.findViewById(R.id.botonCalcular)
         tituloFormula = view.findViewById(R.id.TituloFormula)
+        resultadoTextView = view.findViewById(R.id.TextoResultado)
+        textoFormulaConValores = view.findViewById(R.id.textoFormulaConValores)
+        layoutTextoFormulayTextoResultado = view.findViewById(R.id.layoutTextoFormulayTextoResultado)
         val botonHistorial = view.findViewById<ImageView>(R.id.verHistorial)
 
         botonHistorial.setOnClickListener {
             val bundle = Bundle()
             bundle.putString("calculadoraId", calculadora?.id.toString())
+            Log.d("CalculadoraId", calculadora?.id.toString())
             findNavController().navigate(R.id.navigation_historialCalculadora, bundle)
         }
 
-        // Recibir el calculadoraItem
         calculadora = arguments?.getParcelable("calculadoraItem")
         calculadora?.let { it.latexformula?.let { it1 -> renderLaTeX(it1) } }
 
@@ -64,34 +70,26 @@ class UsarCalculadoraFragment : Fragment() {
             val formula = calculadora!!.formula
             val variableNames = formula?.let { extraerVariablesDeFormula(it) }
 
-            // Limpiar la lista de variables antes de agregar nuevas variables
             variables.clear()
-
-            // Agregar variables únicas a la lista
             if (variableNames != null) {
                 for (variable in variableNames.distinct()) {
                     variables.add(Variable(variable, null))
                 }
             }
 
-            // Configurar RecyclerView
             variablesRecyclerView.layoutManager = LinearLayoutManager(context)
             variablesRecyclerView.adapter = VariablesAdapter(variables)
 
-            // Manejar el botón de calcular
             calculateButton.setOnClickListener {
                 viewLifecycleOwner.lifecycleScope.launch {
                     val values = variables.map { it.value }
                     if (values.all { it != null }) {
-                        // Perform the calculation with the entered values
                         val result = formula?.let { it1 -> variableNames?.let { it2 -> calculate(it1, it2.distinct(), values.filterNotNull()) } }
 
-                        // Retrieve IdEstudiante from SharedPreferences
                         val sharedPreferences = requireContext().getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
                         val idEstudiante = sharedPreferences.getString("IdEstudiante", null)?.let { UUID.fromString(it) }
 
                         if (idEstudiante != null && calculadora != null) {
-                            // Create HistorialCalculadoraApi
                             val historialCalculadora = HistorialCalculadoraApi(
                                 id = UUID.randomUUID(),
                                 idcalculadora = calculadora!!.id,
@@ -102,25 +100,28 @@ class UsarCalculadoraFragment : Fragment() {
                             )
                             val historialId = createHistorialCalculadora(historialCalculadora)
 
-                            // Create VariableHistorialApi for each variable
                             if (historialId != null) {
                                 variables.forEach { variable ->
                                     createVariableHistorial(variable, historialId)
                                 }
                             }
 
-                            // Display the result (you can use a TextView or a Toast)
-                            Toast.makeText(context, "Resultado: $result", Toast.LENGTH_LONG).show()
+                            val updatedFormula = formula?.let { it1 ->
+                                if (variableNames != null) {
+                                    replaceVariablesWithValues(it1, variableNames, values.filterNotNull())
+                                } else {
+                                    ""
+                                }
+                            }
+                            textoFormulaConValores.text = updatedFormula
+                            textoFormulaConValores.text = updatedFormula.toString()
+                            resultadoTextView.text = "Resultado: $result"
+                            layoutTextoFormulayTextoResultado.visibility = View.VISIBLE
                         } else {
                             Toast.makeText(context, "Error: IdEstudiante or Calculadora is null.", Toast.LENGTH_LONG).show()
                         }
                     } else {
-                        // Handle the case where one or more values are not valid
-                        Toast.makeText(
-                            context,
-                            "Por favor, ingrese todos los valores correctamente.",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Toast.makeText(context, "Please fill in all variable values.", Toast.LENGTH_LONG).show()
                     }
                 }
             }
@@ -129,6 +130,14 @@ class UsarCalculadoraFragment : Fragment() {
         }
 
         return view
+    }
+
+    private fun replaceVariablesWithValues(formula: String, variables: List<String>, values: List<Double>): String {
+        var updatedFormula = formula
+        for ((variable, value) in variables.zip(values)) {
+            updatedFormula = updatedFormula.replace(variable, value.toString())
+        }
+        return updatedFormula
     }
 
     private fun renderLaTeX(latex: String) {
@@ -160,7 +169,7 @@ class UsarCalculadoraFragment : Fragment() {
         tituloFormula.settings.loadWithOverviewMode = true
         tituloFormula.settings.useWideViewPort = true
         tituloFormula.loadDataWithBaseURL(null, mathJaxConfig, "text/html", "utf-8", null)
-}
+    }
 
     private fun extraerVariablesDeFormula(formula: String): List<String> {
         val regex = Regex("\\b[a-zA-Z_]+\\b")
@@ -172,27 +181,22 @@ class UsarCalculadoraFragment : Fragment() {
         val variableMap = variables.zip(values).toMap()
         var parsedFormula = formula
 
-        // Remove the left-hand side of the equation if present
         if (parsedFormula.contains("=")) {
             parsedFormula = parsedFormula.split("=").last().trim()
         }
 
-        // Replace ** with ^ for exponentiation
         parsedFormula = parsedFormula.replace("**", "^")
 
-        // Build the expression
         val expressionBuilder = ExpressionBuilder(parsedFormula)
         for ((variable, value) in variableMap) {
             expressionBuilder.variable(variable)
         }
         val expression = expressionBuilder.build()
 
-        // Set variable values
         for ((variable, value) in variableMap) {
             expression.setVariable(variable, value)
         }
 
-        // Evaluate the expression
         return try {
             expression.evaluate()
         } catch (e: Exception) {
@@ -237,14 +241,14 @@ class VariablesAdapter(private val variables: MutableList<Variable>) : RecyclerV
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VariableViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_variable, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_variable, parent, false)
         return VariableViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: VariableViewHolder, position: Int) {
         val variable = variables[position]
         holder.variableName.text = variable.name
-        holder.variableValue.hint = "Ingrese valor para ${variable.name}"
         holder.variableValue.setText(variable.value?.toString() ?: "")
         holder.variableValue.addTextChangedListener {
             variable.value = it.toString().toDoubleOrNull()
