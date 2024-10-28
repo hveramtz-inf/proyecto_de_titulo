@@ -8,7 +8,7 @@ data class HistorialCalculadoraApi(
     val idcalculadora: UUID,
     val idestudiante: UUID,
     val formulalatex: String,
-    val resultado: Number,
+    val resultado: Float,
     val created_at: Date
 )
 

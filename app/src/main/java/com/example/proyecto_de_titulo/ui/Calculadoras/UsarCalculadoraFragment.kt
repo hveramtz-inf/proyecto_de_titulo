@@ -95,7 +95,7 @@ class UsarCalculadoraFragment : Fragment() {
                                 idcalculadora = calculadora!!.id,
                                 idestudiante = idEstudiante,
                                 formulalatex = calculadora!!.latexformula ?: "",
-                                resultado = result ?: 0,
+                                resultado = result?.toFloat() ?: 0.0f,
                                 created_at = Date()
                             )
                             val historialId = createHistorialCalculadora(historialCalculadora)

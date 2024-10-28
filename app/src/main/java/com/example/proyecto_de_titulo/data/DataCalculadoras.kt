@@ -70,7 +70,7 @@ data class HistorialCalculadora(
     val formula: String,
     val idCalculadora: Int,
     val resultado: Double,
-    val variables: List<Variable>
+    var variables: List<Variable>
 ) {
     companion object {
         private val historialMap = mutableMapOf<Int, MutableList<HistorialCalculadora>>()

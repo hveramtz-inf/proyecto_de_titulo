@@ -28,79 +28,72 @@
                 app:cardCornerRadius="20dp">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical">
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:layout_weight="0.8"
+                        android:orientation="horizontal">
+
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="237dp"
                             android:layout_height="match_parent"
-                            android:layout_marginTop="2dp"
-                            android:layout_weight="3.7"
-                            android:gravity="center|end"
+                            android:layout_weight="1"
                             android:orientation="horizontal">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_weight="1"
-                                android:orientation="horizontal"></LinearLayout>
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_weight="3"
-                                android:orientation="horizontal">
-
-                                <ImageView
-                                    android:id="@+id/verHistorial"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/baseline_history_24" />
-
-                            </LinearLayout>
-
+                            <!-- Contenido de verHistorial -->
                         </LinearLayout>
 
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="3"
-                            android:orientation="horizontal"
-                            android:padding="10dp">
+                            android:orientation="horizontal">
 
-                            <androidx.cardview.widget.CardView
+                            <ImageView
+                                android:id="@+id/verHistorial"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                app:cardBackgroundColor="#989898"
-                                app:cardCornerRadius="20dp">
+                                android:src="@drawable/baseline_history_24" />
+                        </LinearLayout>
 
-                                <LinearLayout
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1.7"
+                        android:orientation="horizontal"
+                        android:padding="10dp">
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:cardBackgroundColor="#989898"
+                            app:cardCornerRadius="20dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:orientation="horizontal">
+
+                                <WebView
+                                    android:id="@+id/TituloFormula"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:gravity="center"
-                                    android:orientation="horizontal">
-
-
-                                    <WebView
-                                        android:id="@+id/TituloFormula"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        android:layout_gravity="center" />
-                                </LinearLayout>
-                            </androidx.cardview.widget.CardView>
-                        </LinearLayout>
+                                    android:layout_gravity="center" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+                    </LinearLayout>
 
                         <LinearLayout
                             android:id="@+id/layoutTextoFormulayTextoResultado"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="3"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
                             android:orientation="horizontal"
                             android:visibility="gone">
 
@@ -127,36 +120,33 @@
                             </LinearLayout>
                         </LinearLayout>
 
-                        <LinearLayout
-                            android:id="@+id/contenedorVariables"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="2.5"
+                        android:orientation="horizontal">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/listadoDeVariables"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1.4"
+                        android:gravity="center|center_horizontal|fill_horizontal"
+                        android:orientation="horizontal"
+                        android:padding="20dp">
+
+                        <Button
+                            android:id="@+id/botonCalcular"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_weight="2"
-                            android:orientation="horizontal">
-
-                            <androidx.recyclerview.widget.RecyclerView
-                                android:id="@+id/listadoDeVariables"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_weight="3.3"
-                            android:gravity="center|center_horizontal|fill_horizontal"
-                            android:orientation="horizontal"
-                            android:padding="20dp">
-
-                            <Button
-                                android:id="@+id/botonCalcular"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:backgroundTint="#989898"
-                                android:text="Calcular"
-                                android:textSize="24sp" />
-                        </LinearLayout>
-
+                            android:backgroundTint="#989898"
+                            android:text="Calcular"
+                            android:textSize="24sp" />
                     </LinearLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

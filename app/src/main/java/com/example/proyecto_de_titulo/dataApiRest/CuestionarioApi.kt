@@ -8,7 +8,6 @@ data class CuestionarioApi(
     val idcurso : UUID
 )
 
-
 data class ResCuestionarioApi(
     val id : UUID,
     val Titulo : String,

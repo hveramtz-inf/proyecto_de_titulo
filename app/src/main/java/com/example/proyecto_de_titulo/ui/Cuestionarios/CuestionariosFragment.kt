@@ -24,6 +24,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+
 class CuestionariosFragment : Fragment() {
 
     private var _binding: FragmentCuestionariosBinding? = null
@@ -54,7 +55,7 @@ class CuestionariosFragment : Fragment() {
         return root
     }
 
-        private fun obtenerPuntajeAlumno() {
+    private fun obtenerPuntajeAlumno() {
         val sharedPreferences = requireContext().getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
         val idEstudiante = sharedPreferences.getString("IdEstudiante", null)
 
@@ -115,7 +116,6 @@ class CuestionariosFragment : Fragment() {
         _binding = null
     }
 }
-
 class CuestionariosAdapter(
     private var cursos: List<CursoApi?>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -189,9 +189,11 @@ class CuestionariosAdapter(
 }
 
 class NestedCuestionariosAdapter(
-    private val cuestionarios: List<CuestionarioApi>,
+    private var cuestionarios: List<CuestionarioApi>,
     private val puntajes: List<PuntajeAlumnoCuestionario>
 ) : RecyclerView.Adapter<NestedCuestionariosAdapter.NestedViewHolder>() {
+
+    private var filteredCuestionarios: List<CuestionarioApi> = cuestionarios
 
     class NestedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val preguntaTextView: Button = itemView.findViewById(R.id.intentarCuestionario)
@@ -205,12 +207,10 @@ class NestedCuestionariosAdapter(
     }
 
     override fun onBindViewHolder(holder: NestedViewHolder, position: Int) {
-        val cuestionario = cuestionarios[position]
+        val cuestionario = filteredCuestionarios[position]
         holder.preguntaTextView.text = (position + 1).toString()
 
-        // Set the progress based on the puntaje
         val puntaje = puntajes.find { it.idcuestionario == cuestionario.id }?.puntaje ?: 0f
-        Log.d("NestedCuestionariosAdapter", "Cuestionario ID: ${cuestionario.id}, Puntaje: $puntaje")
         holder.progressBar.max = 100
         holder.progressBar.progress = puntaje.toInt()
 
@@ -219,26 +219,8 @@ class NestedCuestionariosAdapter(
             intent.putExtra("idCuestionario", cuestionario.id.toString())
             holder.itemView.context.startActivity(intent)
         }
-
-        // Set the button icon based on the favorite state
-        /*if (cuestionario.isFavorite) {
-            holder.boton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_favorite_50, 0, 0, 0)
-        } else {
-            holder.boton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_favorite_border_50, 0, 0, 0)
-        }
-
-        holder.boton.setOnClickListener {
-            // Toggle the favorite state
-            cuestionario.isFavorite = !cuestionario.isFavorite
-
-            // Update the button icon
-            if (cuestionario.isFavorite) {
-                holder.boton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_favorite_50, 0, 0, 0)
-            } else {
-                holder.boton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.baseline_favorite_border_50, 0, 0, 0)
-            }
-        }*/
     }
 
-    override fun getItemCount() = cuestionarios.size
+    override fun getItemCount() = filteredCuestionarios.size
+
 }

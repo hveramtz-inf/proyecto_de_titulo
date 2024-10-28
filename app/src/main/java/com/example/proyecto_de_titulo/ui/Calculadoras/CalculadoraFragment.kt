@@ -17,18 +17,21 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_de_titulo.R
-import com.example.proyecto_de_titulo.data.calculadorasList
 import com.example.proyecto_de_titulo.dataApiRest.CalculadoraApi
+import com.example.proyecto_de_titulo.dataApiRest.calculadorasList
 import com.example.proyecto_de_titulo.databinding.FragmentCalculadorasBinding
 import com.example.proyecto_de_titulo.interfazApiRest.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+
 class CalculadoraFragment : Fragment() {
 
     private var _binding: FragmentCalculadorasBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var calculadorasList: List<CalculadoraApi>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,12 +62,11 @@ class CalculadoraFragment : Fragment() {
 
         botonBuscar.setOnClickListener {
             val busqueda = buscadorCalculadora.text.toString()
-            val calculadorasFiltradas = (calculadorasList as List<CalculadoraApi>).filter {
+            val calculadorasFiltradas = calculadorasList.filter {
                 it.nombre?.contains(busqueda, ignoreCase = true) ?: false
             }
             listadoCalculadora.adapter = CalculadoraAdapter(calculadorasFiltradas, navController)
         }
-
         fetchCalculadoras() // Fetch calculators from the API
 
         return root
@@ -75,8 +77,8 @@ class CalculadoraFragment : Fragment() {
         apiService.getCalculadoras().enqueue(object : Callback<List<CalculadoraApi>> {
             override fun onResponse(call: Call<List<CalculadoraApi>>, response: Response<List<CalculadoraApi>>) {
                 if (response.isSuccessful) {
-                    val calculadoras = response.body() ?: emptyList()
-                    updateCalculadoraList(calculadoras)
+                    calculadorasList = response.body() ?: emptyList()
+                    updateCalculadoraList(calculadorasList)
                 } else {
                     Log.e("CalculadoraFragment", "Failed to fetch calculators")
                 }
@@ -87,8 +89,6 @@ class CalculadoraFragment : Fragment() {
             }
         })
     }
-
-
 
     private fun updateCalculadoraList(calculadoras: List<CalculadoraApi>) {
         val navController = findNavController()
