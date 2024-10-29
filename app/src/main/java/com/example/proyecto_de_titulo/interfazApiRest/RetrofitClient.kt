@@ -69,4 +69,12 @@ object RetrofitClient {
         retrofit.create(VariableHistorialApiService::class.java)
     }
 
+    val favoritoCalculadoraApiService: FavoritoCalculadoraApiService by lazy {
+        retrofit.create(FavoritoCalculadoraApiService::class.java)
+    }
+
+    val favoritoCuestionarioApiService: FavoritoCuestionarioApiService by lazy {
+        retrofit.create(FavoritoCuestionarioApiService::class.java)
+    }
+
 }

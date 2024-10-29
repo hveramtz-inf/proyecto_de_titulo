@@ -12,24 +12,26 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_de_titulo.R
 import com.example.proyecto_de_titulo.dataApiRest.CuestionarioApi
 import com.example.proyecto_de_titulo.dataApiRest.CursoApi
+import com.example.proyecto_de_titulo.dataApiRest.FavoritosCuestionario
 import com.example.proyecto_de_titulo.dataApiRest.PuntajeAlumnoCuestionario
 import com.example.proyecto_de_titulo.databinding.FragmentCuestionariosBinding
 import com.example.proyecto_de_titulo.interfazApiRest.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
+import java.util.UUID
 
 class CuestionariosFragment : Fragment() {
 
     private var _binding: FragmentCuestionariosBinding? = null
     private val binding get() = _binding!!
-    private lateinit var cuestionariosAdapter: CuestionariosAdapter
+    private lateinit var cuestionariosAdapter: CursoAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,7 +41,7 @@ class CuestionariosFragment : Fragment() {
         val root: View = binding.root
 
         // Initialize the adapter with an empty list
-        cuestionariosAdapter = CuestionariosAdapter(emptyList())
+        cuestionariosAdapter = CursoAdapter(emptyList())
 
         // Configure the RecyclerView with a LayoutManager and the adapter
         binding.listadoCuestionarios.layoutManager = LinearLayoutManager(context)
@@ -51,7 +53,16 @@ class CuestionariosFragment : Fragment() {
         // Fetch cursos from API
         obtenerCursos()
         obtenerPuntajeAlumno()
+        obtenerFavoritosCuestionarios()
 
+        val botonListaFavoritosCuestionarios: Button = binding.root.findViewById(R.id.botonIrFavCuestionario)
+        botonListaFavoritosCuestionarios.setOnClickListener {
+            val bundle = Bundle()
+            bundle.putParcelableArrayList("cuestionarios", ArrayList(cuestionariosList))
+            bundle.putParcelableArrayList("favoritosCuestionarios", ArrayList(favoritosCuestionarios))
+
+            findNavController().navigate(R.id.navigation_favoritosCuestionarios, bundle)
+        }
         return root
     }
 
@@ -103,6 +114,33 @@ class CuestionariosFragment : Fragment() {
         })
     }
 
+    private fun obtenerFavoritosCuestionarios() {
+        val sharedPreferences = requireContext().getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
+        val idEstudiante = sharedPreferences.getString("IdEstudiante", null)
+
+        if (idEstudiante != null) {
+            val apiService = RetrofitClient.favoritoCuestionarioApiService
+            apiService.getFavoritosCuestionarioByEstudiante(idEstudiante).enqueue(object : Callback<List<FavoritosCuestionario>> {
+                override fun onResponse(call: Call<List<FavoritosCuestionario>>, response: Response<List<FavoritosCuestionario>>) {
+                    if (response.isSuccessful) {
+                        val favoritos = response.body()
+                        if (favoritos != null) {
+                            cuestionariosAdapter.updateFavoritos(favoritos)
+                        }
+                    } else {
+                        Toast.makeText(context, "Failed to load favoritos", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<List<FavoritosCuestionario>>, t: Throwable) {
+                    Toast.makeText(context, "Error loading favoritos", Toast.LENGTH_SHORT).show()
+                }
+            })
+        } else {
+            Toast.makeText(context, "idAlumno not found in SharedPreferences", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun showLoading() {
         cuestionariosAdapter.updateData(listOf(null))
     }
@@ -116,13 +154,15 @@ class CuestionariosFragment : Fragment() {
         _binding = null
     }
 }
-class CuestionariosAdapter(
+
+class CursoAdapter(
     private var cursos: List<CursoApi?>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val VIEW_TYPE_ITEM = 0
     private val VIEW_TYPE_LOADING = 1
     private var puntajes: List<PuntajeAlumnoCuestionario> = emptyList()
+    private var favoritosCuestionarios: List<FavoritosCuestionario> = emptyList()
 
     inner class CuestionarioViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val contenedorTituloCuestionario: TextView = itemView.findViewById(R.id.textView2)
@@ -156,6 +196,7 @@ class CuestionariosAdapter(
                         val cuestionarios = response.body()
                         if (cuestionarios != null) {
                             val nestedAdapter = NestedCuestionariosAdapter(cuestionarios, puntajes)
+                            nestedAdapter.updateFavoritos(favoritosCuestionarios)
                             holder.listadoDeCuestionarios.layoutManager = LinearLayoutManager(holder.itemView.context, RecyclerView.HORIZONTAL, false)
                             holder.listadoDeCuestionarios.adapter = nestedAdapter
                         }
@@ -186,6 +227,11 @@ class CuestionariosAdapter(
         this.puntajes = newPuntajes
         notifyDataSetChanged()
     }
+
+    fun updateFavoritos(favoritos: List<FavoritosCuestionario>) {
+        this.favoritosCuestionarios = favoritos
+        notifyDataSetChanged()
+    }
 }
 
 class NestedCuestionariosAdapter(
@@ -194,10 +240,12 @@ class NestedCuestionariosAdapter(
 ) : RecyclerView.Adapter<NestedCuestionariosAdapter.NestedViewHolder>() {
 
     private var filteredCuestionarios: List<CuestionarioApi> = cuestionarios
+    private var favoritosCuestionarios: List<FavoritosCuestionario> = emptyList()
 
     class NestedViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val preguntaTextView: Button = itemView.findViewById(R.id.intentarCuestionario)
         val progressBar: ProgressBar = itemView.findViewById(R.id.progressBar)
+        val guardarFavoritoButton: Button = itemView.findViewById(R.id.guardarFavoritoCuestionario)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NestedViewHolder {
@@ -214,13 +262,89 @@ class NestedCuestionariosAdapter(
         holder.progressBar.max = 100
         holder.progressBar.progress = puntaje.toInt()
 
+        val isFavorito = favoritosCuestionarios.any { it.idcuestionario == cuestionario.id }
+        holder.guardarFavoritoButton.setBackgroundResource(
+            if (isFavorito) R.drawable.baseline_favorite_24 else R.drawable.baseline_favorite_border_24
+        )
+
         holder.preguntaTextView.setOnClickListener {
             val intent = Intent(holder.itemView.context, IntentarCuestionario::class.java)
             intent.putExtra("idCuestionario", cuestionario.id.toString())
             holder.itemView.context.startActivity(intent)
         }
+
+        holder.guardarFavoritoButton.setOnClickListener {
+            if (isFavorito) {
+                deleteFavorito(cuestionario.id, holder)
+            } else {
+                addFavorito(cuestionario.id, holder)
+            }
+        }
     }
 
     override fun getItemCount() = filteredCuestionarios.size
 
+    fun updateFavoritos(favoritos: List<FavoritosCuestionario>) {
+        this.favoritosCuestionarios = favoritos
+        notifyDataSetChanged()
+    }
+
+    private fun addFavorito(idCuestionario: UUID, holder: NestedViewHolder) {
+        val sharedPreferences = holder.itemView.context.getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
+        val idEstudiante = sharedPreferences.getString("IdEstudiante", null) ?: return
+
+        val favorito = FavoritosCuestionario(idestudiante = UUID.fromString(idEstudiante), idcuestionario = idCuestionario)
+        RetrofitClient.favoritoCuestionarioApiService.createFavoritoCuestionario(favorito).enqueue(object : Callback<FavoritosCuestionario> {
+            override fun onResponse(call: Call<FavoritosCuestionario>, response: Response<FavoritosCuestionario>) {
+                if (response.isSuccessful) {
+                    obtenerFavoritosCuestionarios(holder)
+                } else {
+                    Toast.makeText(holder.itemView.context, "Failed to add favorite", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<FavoritosCuestionario>, t: Throwable) {
+                Toast.makeText(holder.itemView.context, "Error adding favorite", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun deleteFavorito(idCuestionario: UUID, holder: NestedViewHolder) {
+        val favorito = favoritosCuestionarios.find { it.idcuestionario == idCuestionario } ?: return
+        RetrofitClient.favoritoCuestionarioApiService.deleteFavoritoCuestionario(favorito.id.toString()).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    obtenerFavoritosCuestionarios(holder)
+                } else {
+                    Toast.makeText(holder.itemView.context, "Failed to remove favorite", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Toast.makeText(holder.itemView.context, "Error removing favorite", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    private fun obtenerFavoritosCuestionarios(holder: NestedViewHolder) {
+        val sharedPreferences = holder.itemView.context.getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
+        val idEstudiante = sharedPreferences.getString("IdEstudiante", null) ?: return
+
+        RetrofitClient.favoritoCuestionarioApiService.getFavoritosCuestionarioByEstudiante(idEstudiante).enqueue(object : Callback<List<FavoritosCuestionario>> {
+            override fun onResponse(call: Call<List<FavoritosCuestionario>>, response: Response<List<FavoritosCuestionario>>) {
+                if (response.isSuccessful) {
+                    val favoritos = response.body()
+                    if (favoritos != null) {
+                        updateFavoritos(favoritos)
+                    }
+                } else {
+                    Toast.makeText(holder.itemView.context, "Failed to load favoritos", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<FavoritosCuestionario>>, t: Throwable) {
+                Toast.makeText(holder.itemView.context, "Error loading favoritos", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
 }

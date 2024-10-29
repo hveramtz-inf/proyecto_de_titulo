@@ -4,6 +4,8 @@ import com.example.proyecto_de_titulo.dataApiRest.ApuntesApi
 import com.example.proyecto_de_titulo.dataApiRest.CalculadoraApi
 import com.example.proyecto_de_titulo.dataApiRest.CuestionarioApi
 import com.example.proyecto_de_titulo.dataApiRest.CursoApi
+import com.example.proyecto_de_titulo.dataApiRest.FavoritosCalculadora
+import com.example.proyecto_de_titulo.dataApiRest.FavoritosCuestionario
 import com.example.proyecto_de_titulo.dataApiRest.HistorialCalculadoraApi
 import com.example.proyecto_de_titulo.dataApiRest.LoginRequest
 import com.example.proyecto_de_titulo.dataApiRest.LoginResponse
@@ -201,3 +203,37 @@ interface VariableHistorialApiService
 }
 
 
+interface FavoritoCalculadoraApiService {
+    @GET("favoritosCalculadora")
+    fun getFavoritosCalculadora(): Call<List<FavoritosCalculadora>>
+
+    @GET("favoritosCalculadora/estudiante/{id}")
+    fun getFavoritosCalculadoraByEstudiante(@Path("id") idEstudiante: String): Call<List<FavoritosCalculadora>>
+
+    @GET("favoritosCalculadora/{id}")
+    fun getFavoritoCalculadoraById(@Path("id") id: String): Call<FavoritosCalculadora>
+
+    @POST("favoritosCalculadora")
+    fun createFavoritoCalculadora(@Body favoritoCalculadora: FavoritosCalculadora): Call<FavoritosCalculadora>
+
+    @DELETE("favoritosCalculadora/{id}")
+    fun deleteFavoritoCalculadora(@Path("id") id: String): Call<Void>
+}
+
+
+interface FavoritoCuestionarioApiService {
+    @GET("favoritosCuestionario")
+    fun getFavoritosCuestionario(): Call<List<FavoritosCuestionario>>
+
+    @GET("favoritosCuestionario/{id}")
+    fun getFavoritoCuestionarioById(@Path("id") id: String): Call<FavoritosCuestionario>
+
+    @GET("favoritosCuestionario/estudiante/{id}")
+    fun getFavoritosCuestionarioByEstudiante(@Path("id") idEstudiante: String): Call<List<FavoritosCuestionario>>
+
+    @POST("favoritosCuestionario")
+    fun createFavoritoCuestionario(@Body favoritoCuestionario: FavoritosCuestionario): Call<FavoritosCuestionario>
+
+    @DELETE("favoritosCuestionario/{id}")
+    fun deleteFavoritoCuestionario(@Path("id") id: String): Call<Void>
+}
