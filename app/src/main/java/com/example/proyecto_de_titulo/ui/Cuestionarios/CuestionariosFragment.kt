@@ -43,6 +43,9 @@ class CuestionariosFragment : Fragment() {
         // Initialize the adapter with an empty list
         cuestionariosAdapter = CursoAdapter(emptyList())
 
+        val cuestionariosList = ArrayList<CuestionarioApi>()
+        val favoritosCuestionarios = ArrayList<FavoritosCuestionario>()
+
         // Configure the RecyclerView with a LayoutManager and the adapter
         binding.listadoCuestionarios.layoutManager = LinearLayoutManager(context)
         binding.listadoCuestionarios.adapter = cuestionariosAdapter
