@@ -43,8 +43,7 @@ class CuestionariosFragment : Fragment() {
         // Initialize the adapter with an empty list
         cuestionariosAdapter = CursoAdapter(emptyList())
 
-        val cuestionariosList = ArrayList<CuestionarioApi>()
-        val favoritosCuestionarios = ArrayList<FavoritosCuestionario>()
+
 
         // Configure the RecyclerView with a LayoutManager and the adapter
         binding.listadoCuestionarios.layoutManager = LinearLayoutManager(context)
@@ -60,11 +59,7 @@ class CuestionariosFragment : Fragment() {
 
         val botonListaFavoritosCuestionarios: Button = binding.root.findViewById(R.id.botonIrFavCuestionario)
         botonListaFavoritosCuestionarios.setOnClickListener {
-            val bundle = Bundle()
-            bundle.putParcelableArrayList("cuestionarios", ArrayList(cuestionariosList))
-            bundle.putParcelableArrayList("favoritosCuestionarios", ArrayList(favoritosCuestionarios))
-
-            findNavController().navigate(R.id.navigation_favoritosCuestionarios, bundle)
+            findNavController().navigate(R.id.navigation_favoritosCuestionarios)
         }
         return root
     }

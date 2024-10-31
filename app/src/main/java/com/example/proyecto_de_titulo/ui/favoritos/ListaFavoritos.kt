@@ -33,6 +33,7 @@ class ListaFavoritos : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: FavoritosAdapter
     private var favoritosCuestionarios: List<FavoritosCuestionario>? = null
+    private var cuestionarios: List<CuestionarioApi>? = null
     private var favoritosCalculadora: List<FavoritosCalculadora>? = null
 
     @SuppressLint("MissingInflatedId")
@@ -44,13 +45,11 @@ class ListaFavoritos : Fragment() {
         recyclerView = view.findViewById(R.id.listaCuestionariosFavoritos)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        val cuestionariosFavoritos = arguments?.getParcelableArrayList<CuestionarioApi>("cuestionarios")
-        Log.d("Cuestionarios", cuestionariosFavoritos.toString())
-        favoritosCuestionarios = arguments?.getParcelableArrayList("favoritosCuestionarios")
-        val calculadorasFavoritas = arguments?.getParcelableArrayList<CalculadoraApi>("calculadoras")
+
+        val calculadoras = arguments?.getParcelableArrayList<CalculadoraApi>("calculadoras")
         favoritosCalculadora = arguments?.getParcelableArrayList("favoritosCalculadora")
 
-        adapter = FavoritosAdapter(cuestionariosFavoritos, favoritosCuestionarios, calculadorasFavoritas, favoritosCalculadora, this)
+        adapter = FavoritosAdapter(cuestionarios, favoritosCuestionarios, calculadoras, favoritosCalculadora, this)
         recyclerView.adapter = adapter
 
         return view

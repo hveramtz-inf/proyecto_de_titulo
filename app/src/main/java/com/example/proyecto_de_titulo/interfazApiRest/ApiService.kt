@@ -78,6 +78,9 @@ interface CuestionarioApiService {
 
     @DELETE("cuestionarios/{id}")
     fun deleteCuestionario(@Path("id") id: String): Call<Void>
+
+    @GET("cuestionarios/clavepucv/{clavepucv}")
+    fun getCuestionariosByClavePucv(@Path("clavepucv") clavePucv: String): Call<List<CuestionarioApi>>
 }
 
 interface PreguntaApiService {

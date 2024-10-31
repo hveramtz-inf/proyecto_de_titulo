@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_de_titulo.R
 import com.example.proyecto_de_titulo.dataApiRest.CalculadoraApi
 import com.example.proyecto_de_titulo.dataApiRest.FavoritosCalculadora
-import com.example.proyecto_de_titulo.dataApiRest.calculadorasList
 import com.example.proyecto_de_titulo.databinding.FragmentCalculadorasBinding
 import com.example.proyecto_de_titulo.interfazApiRest.RetrofitClient
 import retrofit2.Call
