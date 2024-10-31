@@ -6,7 +6,7 @@ import android.os.Parcelable
 
 data class CuestionarioApi(
     val id: UUID,
-    val Titulo: String,
+    val titulo: String,
     val idcurso: UUID
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
@@ -17,7 +17,7 @@ data class CuestionarioApi(
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id.toString())
-        parcel.writeString(Titulo)
+        parcel.writeString(titulo)
         parcel.writeString(idcurso.toString())
     }
 

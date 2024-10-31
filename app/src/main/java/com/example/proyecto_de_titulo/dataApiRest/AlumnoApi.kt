@@ -7,7 +7,7 @@ data class AlumnoApi(
     val nombre: String,
     val rut: String,
     val contrasenia: String,
-    val clavepucvid: UUID
+    val clavepucv: UUID
 )
 
 data class LoginRequest(
@@ -20,5 +20,5 @@ data class LoginResponse(
     val nombre: String,
     val rut: String,
     val contrasenia: String,
-    val clavepucvid: UUID
+    val clavepucv: UUID
 )

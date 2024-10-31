@@ -37,23 +37,38 @@ class ListaFavoritos : Fragment() {
     private var favoritosCalculadora: List<FavoritosCalculadora>? = null
 
     @SuppressLint("MissingInflatedId")
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val view = inflater.inflate(R.layout.fragment_lista_favoritos, container, false)
-        recyclerView = view.findViewById(R.id.listaCuestionariosFavoritos)
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View {
+            val view = inflater.inflate(R.layout.fragment_lista_favoritos, container, false)
+            recyclerView = view.findViewById(R.id.listaCuestionariosFavoritos)
+            recyclerView.layoutManager = LinearLayoutManager(context)
 
+            val sharedPreferences = requireContext().getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
+            val clavePucv = sharedPreferences.getString("ClavePucvid", null)
+            Log.d("ClavePucv", clavePucv.toString())
+            val idEstudiante = sharedPreferences.getString("IdEstudiante", null)
 
-        val calculadoras = arguments?.getParcelableArrayList<CalculadoraApi>("calculadoras")
-        favoritosCalculadora = arguments?.getParcelableArrayList("favoritosCalculadora")
+            val calculadoras = arguments?.getParcelableArrayList<CalculadoraApi>("calculadoras")
+            favoritosCalculadora = arguments?.getParcelableArrayList("favoritosCalculadora")
 
-        adapter = FavoritosAdapter(cuestionarios, favoritosCuestionarios, calculadoras, favoritosCalculadora, this)
-        recyclerView.adapter = adapter
+            Log.d("Calculadoras", calculadoras.toString())
 
-        return view
-    }
+            adapter = FavoritosAdapter(cuestionarios, favoritosCuestionarios, calculadoras, favoritosCalculadora, this)
+
+            if (idEstudiante != null) {
+                if (clavePucv != null) {
+                    obtenerCuestionarios(clavePucv)
+                }
+                obtenerCuestionariosFavoritos(idEstudiante)
+            } else {
+                Toast.makeText(context, "ClavePucv not found in SharedPreferences", Toast.LENGTH_SHORT).show()
+            }
+            recyclerView.adapter = adapter
+
+            return view
+        }
 
     fun addFavoritoCuestionario(idCuestionario: UUID, holder: FavoritosAdapter.CuestionarioViewHolder) {
         val sharedPreferences = requireContext().getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
@@ -89,6 +104,47 @@ class ListaFavoritos : Fragment() {
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 Toast.makeText(requireContext(), "Error removing favorite", Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    fun obtenerCuestionarios(clavePucv: String) {
+        RetrofitClient.cuestionarioApiService.getCuestionariosByClavePucv(clavePucv).enqueue(object : Callback<List<CuestionarioApi>> {
+            override fun onResponse(call: Call<List<CuestionarioApi>>, response: Response<List<CuestionarioApi>>) {
+                if (response.isSuccessful) {
+                    cuestionarios = response.body()
+                    if (cuestionarios != null) {
+                        Log.d("Cuestionarios", "Cuestionarios loaded: ${cuestionarios.toString()}")
+                        adapter.updateCuestionarios(cuestionarios!!)
+                    } else {
+                        Log.d("Cuestionarios", "Cuestionarios list is null")
+                    }
+                } else {
+                    Toast.makeText(context, "Failed to load cuestionarios", Toast.LENGTH_SHORT).show()
+                    Log.d("Cuestionarios", "Failed to load cuestionarios: ${response.errorBody()?.string()}")
+                }
+            }
+
+            override fun onFailure(call: Call<List<CuestionarioApi>>, t: Throwable) {
+                Toast.makeText(context, "Error loading cuestionarios", Toast.LENGTH_SHORT).show()
+                Log.d("Cuestionarios", "Error loading cuestionarios: ${t.message}")
+            }
+        })
+    }
+
+    fun obtenerCuestionariosFavoritos(idEstudiante: String) {
+        RetrofitClient.favoritoCuestionarioApiService.getFavoritosCuestionarioByEstudiante(idEstudiante).enqueue(object : Callback<List<FavoritosCuestionario>> {
+            override fun onResponse(call: Call<List<FavoritosCuestionario>>, response: Response<List<FavoritosCuestionario>>) {
+                if (response.isSuccessful) {
+                    favoritosCuestionarios = response.body()
+                    fetchFavoritosCuestionarios()
+                } else {
+                    Toast.makeText(context, "Failed to load favoritos", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<List<FavoritosCuestionario>>, t: Throwable) {
+                Toast.makeText(context, "Error loading favoritos", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -139,18 +195,22 @@ class ListaFavoritos : Fragment() {
                 override fun onResponse(call: Call<List<FavoritosCuestionario>>, response: Response<List<FavoritosCuestionario>>) {
                     if (response.isSuccessful) {
                         favoritosCuestionarios = response.body() ?: emptyList()
+                        Log.d("FavoritosCuestionarios", "Favoritos loaded: ${favoritosCuestionarios.toString()}")
                         adapter.updateFavoritosCuestionarios(favoritosCuestionarios!!)
                     } else {
                         Toast.makeText(context, "Failed to load favoritos", Toast.LENGTH_SHORT).show()
+                        Log.d("FavoritosCuestionarios", "Failed to load favoritos: ${response.errorBody()?.string()}")
                     }
                 }
 
                 override fun onFailure(call: Call<List<FavoritosCuestionario>>, t: Throwable) {
                     Toast.makeText(context, "Error loading favoritos", Toast.LENGTH_SHORT).show()
+                    Log.d("FavoritosCuestionarios", "Error loading favoritos: ${t.message}")
                 }
             })
         } else {
-            Toast.makeText(context, "idAlumno not found in SharedPreferences", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "idEstudiante not found in SharedPreferences", Toast.LENGTH_SHORT).show()
+            Log.d("FavoritosCuestionarios", "idEstudiante not found in SharedPreferences")
         }
     }
 
@@ -179,23 +239,34 @@ class ListaFavoritos : Fragment() {
 
 // FavoritosAdapter.kt
 class FavoritosAdapter(
-    private val cuestionarios: List<CuestionarioApi>?,
+    private var cuestionarios: List<CuestionarioApi>?,
     private var favoritosCuestionarios: List<FavoritosCuestionario>?,
-    private val calculadoras: List<CalculadoraApi>?,
+    private var calculadoras: List<CalculadoraApi>?,
     private var favoritosCalculadora: List<FavoritosCalculadora>?,
     private val fragment: ListaFavoritos
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val filteredCuestionarios: List<CuestionarioApi> = cuestionarios?.filter { cuestionario ->
-        favoritosCuestionarios?.any { it.idcuestionario == cuestionario.id } ?: false
-    } ?: emptyList()
+    private var filteredCuestionarios: List<CuestionarioApi> = emptyList()
+    private var filteredCalculadoras: List<CalculadoraApi> = emptyList()
 
-    private val filteredCalculadoras: List<CalculadoraApi> = calculadoras?.filter { calculadora ->
-        favoritosCalculadora?.any { favorito -> favorito.idcalculadora == calculadora.id } ?: false
-    } ?: emptyList()
+    companion object {
+        const val VIEW_TYPE_CUESTIONARIO = 0
+        const val VIEW_TYPE_CALCULADORA = 1
+    }
 
-    private val VIEW_TYPE_CUESTIONARIO = 0
-    private val VIEW_TYPE_CALCULADORA = 1
+    init {
+        updateFilteredLists()
+    }
+
+    private fun updateFilteredLists() {
+        filteredCuestionarios = cuestionarios?.filter { cuestionario ->
+            favoritosCuestionarios?.any { it.idcuestionario == cuestionario.id } ?: false
+        } ?: emptyList()
+
+        filteredCalculadoras = calculadoras?.filter { calculadora ->
+            favoritosCalculadora?.any { favorito -> favorito.idcalculadora == calculadora.id } ?: false
+        } ?: emptyList()
+    }
 
     override fun getItemViewType(position: Int): Int {
         return if (position < filteredCuestionarios.size) {
@@ -218,7 +289,7 @@ class FavoritosAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is CuestionarioViewHolder) {
             val cuestionario = filteredCuestionarios[position]
-            holder.tituloCuestionario.text = cuestionario.Titulo
+            holder.tituloCuestionario.text = cuestionario.titulo
 
             val isFavorito = favoritosCuestionarios?.any { it.idcuestionario == cuestionario.id } ?: false
             updateFavoriteIcon(holder.botonFavoritoCuestionario, isFavorito)
@@ -288,11 +359,19 @@ class FavoritosAdapter(
 
     fun updateFavoritosCuestionarios(favoritos: List<FavoritosCuestionario>) {
         this.favoritosCuestionarios = favoritos
+        updateFilteredLists()
         notifyDataSetChanged()
     }
 
     fun updateFavoritosCalculadora(favoritos: List<FavoritosCalculadora>) {
         this.favoritosCalculadora = favoritos
+        updateFilteredLists()
+        notifyDataSetChanged()
+    }
+
+    fun updateCuestionarios(cuestionarios: List<CuestionarioApi>) {
+        this.cuestionarios = cuestionarios
+        updateFilteredLists()
         notifyDataSetChanged()
     }
 

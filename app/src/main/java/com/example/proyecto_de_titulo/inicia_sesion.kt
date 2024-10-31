@@ -105,7 +105,7 @@ class inicia_sesion : AppCompatActivity() {
         editor.putString("Contrasenia", loginResponse.contrasenia)
         editor.putString("Nombre", loginResponse.nombre)
         editor.putString("IdEstudiante", loginResponse.idestudiante?.toString() ?: "")
-        editor.putString("ClavePucvid", loginResponse.clavepucvid?.toString() ?: "")
+        editor.putString("ClavePucvid", loginResponse.clavepucv?.toString() ?: "")
         editor.apply()
     }
 }
