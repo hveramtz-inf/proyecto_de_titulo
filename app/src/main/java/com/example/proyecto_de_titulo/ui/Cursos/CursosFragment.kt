@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -199,6 +200,7 @@ class HomeFragment : Fragment() {
 
         inner class CursoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val cursoTitulo: TextView = itemView.findViewById(R.id.TituloCurso)
+            val barraDeProgreso: ProgressBar = itemView.findViewById(R.id.BarraDeProgresoCurso)
         }
 
         inner class LoadingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
@@ -219,6 +221,15 @@ class HomeFragment : Fragment() {
             if (holder is CursoViewHolder) {
                 val curso = cursos[position]
                 holder.cursoTitulo.text = curso?.nombre
+
+                // Find the matching ProgresoCursoApi for the current curso
+                val progresoCurso = progresoCursoApi.find { it.idcurso == curso?.id }
+                if (progresoCurso != null) {
+                    holder.barraDeProgreso.progress = progresoCurso.progreso.toInt()
+                } else {
+                    holder.barraDeProgreso.progress = 0
+                }
+
                 holder.cursoTitulo.setOnClickListener {
                     // Save the current adapter
                     previousAdapter = binding.listadoCursos.adapter

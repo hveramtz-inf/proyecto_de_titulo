@@ -21,6 +21,7 @@ import com.example.proyecto_de_titulo.interfazApiRest.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.UUID
 
 class SeccionesFragment : Fragment() {
     private var seccionrevisada = emptyList<SeccionRevisadaApi>()
@@ -36,6 +37,9 @@ class SeccionesFragment : Fragment() {
         val estudianteId = sharedPreferences.getString("IdEstudiante", "0") ?: "0"
 
         obtenerSeccionesRevisadas(estudianteId, seccion?.id.toString())
+        if (seccionrevisada.isEmpty()) {
+            seccion?.id?.let { crearSeccionRevisada(estudianteId, it, seccion?.idcurso) }
+        }
 
         val titulo = view.findViewById<TextView>(R.id.tituloSeccion)
         val contenido = view.findViewById<TextView>(R.id.contenidoSeccion)
@@ -63,7 +67,7 @@ class SeccionesFragment : Fragment() {
             val videoUrl = convertToEmbedUrl(seccion.linkvideoyoutube)
             linkyoutube.loadUrl(videoUrl)
         }
-// SeccionesFragment.kt
+
         botonApuntes.setOnClickListener {
             val bundle = bundleOf("seccionId" to seccion?.id.toString())
             findNavController().navigate(R.id.navigation_apuntes, bundle)
@@ -89,17 +93,16 @@ class SeccionesFragment : Fragment() {
             })
     }
 
-    private fun crearSeccionRevisada(idEstudiante: String, idSeccion: String) {
-        val seccionRevisada = SeccionRevisadaApi(idEstudiante, idSeccion)
+    private fun crearSeccionRevisada(idEstudiante: String, idSeccion: UUID, idCurso: String?) {
+        val seccionRevisada = SeccionRevisadaApi(UUID.randomUUID(), idEstudiante, idSeccion, idCurso)
         RetrofitClient.seccionRevisadaApiService.createSeccionRevisada(seccionRevisada)
             .enqueue(object : Callback<SeccionRevisadaApi> {
                 override fun onResponse(call: Call<SeccionRevisadaApi>, response: Response<SeccionRevisadaApi>) {
                     if (response.isSuccessful) {
-                        val seccionRevisada = response.body()
-                        if (seccionRevisada != null) {
+                        val createdSeccionRevisada = response.body()
+                        if (createdSeccionRevisada != null) {
+                            seccionrevisada = listOf(createdSeccionRevisada)
                             // Handle the created seccion revisada here
-                        } else {
-                            Log.e("SeccionesFragment", "Failed to create seccion revisada: response body is null")
                         }
                     } else {
                         Log.e("SeccionesFragment", "Failed to create seccion revisada: ${response.errorBody()}")
@@ -109,7 +112,7 @@ class SeccionesFragment : Fragment() {
                 override fun onFailure(call: Call<SeccionRevisadaApi>, t: Throwable) {
                     Log.e("SeccionesFragment", "Error creating seccion revisada", t)
                 }
-        })
+            })
     }
 
     private fun convertToEmbedUrl(youtubeUrl: String): String {

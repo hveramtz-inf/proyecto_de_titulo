@@ -72,7 +72,7 @@
                     android:orientation="horizontal">
 
                     <ProgressBar
-                        android:id="@+id/progressBar3"
+                        android:id="@+id/BarraDeProgresoCurso"
                         style="?android:attr/progressBarStyleHorizontal"
                         android:layout_width="333dp"
                         android:layout_height="wrap_content"

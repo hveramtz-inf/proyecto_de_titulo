@@ -4,6 +4,7 @@ import java.util.UUID
 
 data class SeccionRevisadaApi(
     val id: UUID,
-    val idestudiante: UUID,
-    val idseccion: UUID
+    val idestudiante: String,
+    val idseccion: UUID,
+    val idcurso: String?
 )
