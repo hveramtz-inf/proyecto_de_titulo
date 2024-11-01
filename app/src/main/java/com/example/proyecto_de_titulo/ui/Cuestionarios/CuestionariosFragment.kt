@@ -65,8 +65,13 @@ class CuestionariosFragment : Fragment() {
         obtenerFavoritosCuestionarios()
 
         val botonListaFavoritosCuestionarios: Button = binding.root.findViewById(R.id.botonIrFavCuestionario)
+
         botonListaFavoritosCuestionarios.setOnClickListener {
-            findNavController().navigate(R.id.navigation_favoritosCuestionarios)
+            val bundle = Bundle().apply {
+                putParcelableArrayList("cuestionarios", ArrayList(listaCuestionaros))
+                putParcelableArrayList("favoritosCuestionarios", ArrayList(listaFavoritoCuestionarios))
+            }
+            findNavController().navigate(R.id.navigation_favoritosCuestionarios, bundle)
         }
 
         val buscadorCuestionarios: EditText = binding.root.findViewById(R.id.buscadorCuestionario)

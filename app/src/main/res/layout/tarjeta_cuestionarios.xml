@@ -65,11 +65,10 @@
                             <Button
                                 android:id="@+id/guardarFavoritoCuestionario"
                                 android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
+                                android:layout_height="61dp"
                                 android:background="@color/transparente"
                                 android:drawableTint="@color/black"
-                                android:gravity="start"
-                                android:padding="0dp"
+                                android:gravity="center"
                                 app:iconTint="@color/black" />
                         </LinearLayout>
                     </LinearLayout>
