@@ -77,4 +77,12 @@ object RetrofitClient {
         retrofit.create(FavoritoCuestionarioApiService::class.java)
     }
 
+    val progresoCursoApiService: ProgresoCursoApiService by lazy {
+        retrofit.create(ProgresoCursoApiService::class.java)
+    }
+
+    val seccionRevisadaApiService: SeccionRevisadaApiService by lazy {
+        retrofit.create(SeccionRevisadaApiService::class.java)
+    }
+
 }

@@ -10,10 +10,12 @@ import com.example.proyecto_de_titulo.dataApiRest.HistorialCalculadoraApi
 import com.example.proyecto_de_titulo.dataApiRest.LoginRequest
 import com.example.proyecto_de_titulo.dataApiRest.LoginResponse
 import com.example.proyecto_de_titulo.dataApiRest.PreguntaApi
+import com.example.proyecto_de_titulo.dataApiRest.ProgresoCursoApi
 import com.example.proyecto_de_titulo.dataApiRest.PuntajeAlumnoCuestionario
 import com.example.proyecto_de_titulo.dataApiRest.ReqCreateApunteApi
 import com.example.proyecto_de_titulo.dataApiRest.RespuestaApi
 import com.example.proyecto_de_titulo.dataApiRest.SeccionApi
+import com.example.proyecto_de_titulo.dataApiRest.SeccionRevisadaApi
 import com.example.proyecto_de_titulo.dataApiRest.VariableHistorialApi
 import com.example.proyecto_de_titulo.dataApiRest.reqUpdateApunteApi
 import retrofit2.Call
@@ -240,4 +242,48 @@ interface FavoritoCuestionarioApiService {
 
     @DELETE("favoritosCuestionario/{id}")
     fun deleteFavoritoCuestionario(@Path("id") id: String): Call<Void>
+}
+
+
+interface ProgresoCursoApiService {
+    @GET("progresoCurso")
+    fun getProgresoCurso(): Call<List<ProgresoCursoApi>>
+
+    @GET("progresoCurso/{id}")
+    fun getProgresoCursoById(@Path("id") id: String): Call<ProgresoCursoApi>
+
+    @GET("progresoCurso/estudiante/{id}")
+    fun getProgresoCursoByEstudiante(@Path("id") id: String): Call<List<ProgresoCursoApi>>
+
+    @POST("progresoCurso")
+    fun createProgresoCurso(@Body progresoCurso: ProgresoCursoApi): Call<ProgresoCursoApi>
+
+    @PUT("progresoCurso/{id}")
+    fun updateProgresoCurso(@Path("id") id: String, @Body progresoCurso: ProgresoCursoApi): Call<ProgresoCursoApi>
+
+    @DELETE("progresoCurso/{id}")
+    fun deleteProgresoCurso(@Path("id") id: String): Call<Void>
+}
+
+interface SeccionRevisadaApiService {
+    @GET("seccionRevisada")
+    fun getSeccionesRevisadas(): Call<List<SeccionRevisadaApi>>
+
+    @GET("seccionRevisada/{id}")
+    fun getSeccionRevisadaById(@Path("id") id: String): Call<SeccionRevisadaApi>
+
+    @GET("seccionRevisada/estudiante/{id}/seccion/{idseccion}")
+    fun getSeccionRevisadaByEstudianteAndSeccion(
+        @Path("id") idEstudiante: String,
+        @Path("idseccion") idSeccion: String
+    ): Call<List<SeccionRevisadaApi>>
+
+    @POST("seccionRevisada")
+    fun createSeccionRevisada(@Body seccionRevisada: SeccionRevisadaApi): Call<SeccionRevisadaApi>
+
+    @PUT("seccionRevisada/{id}")
+    fun updateSeccionRevisada(@Path("id") id: String, @Body seccionRevisada: SeccionRevisadaApi): Call<SeccionRevisadaApi>
+
+    @DELETE("seccionRevisada/{id}")
+    fun deleteSeccionRevisada(@Path("id") id: String): Call<Void>
 }

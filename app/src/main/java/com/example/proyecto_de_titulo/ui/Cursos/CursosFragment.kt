@@ -1,5 +1,6 @@
 package com.example.proyecto_de_titulo.ui.Cursos
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -20,6 +21,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import com.example.proyecto_de_titulo.dataApiRest.CursoApi
+import com.example.proyecto_de_titulo.dataApiRest.ProgresoCursoApi
 import com.example.proyecto_de_titulo.dataApiRest.SeccionApi
 import com.example.proyecto_de_titulo.interfazApiRest.RetrofitClient
 import java.util.UUID
@@ -32,6 +34,7 @@ class HomeFragment : Fragment() {
     private lateinit var seccionesAdapter: SeccionesAdapter
     private var previousAdapter: RecyclerView.Adapter<*>? = null
     private var originalCursos: List<CursoApi> = emptyList() // List to store original data
+    private var progresoCursoApi = emptyList<ProgresoCursoApi>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,9 +72,37 @@ class HomeFragment : Fragment() {
             cursosAdapter.updateData(cursosFiltrados)
         }
 
+        val sharedPreferences = requireActivity().getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
+        val estudianteId = sharedPreferences.getString("IdEstudiante", "0") ?: "0"
+
+        obtenerProgesosCursos(estudianteId)
+
+        return root
+    }
+
+    private fun obtenerProgesosCursos(estudianteId: String) {
+        RetrofitClient.progresoCursoApiService.getProgresoCursoByEstudiante(estudianteId).enqueue(object : Callback<List<ProgresoCursoApi>> {
+            override fun onResponse(
+                call: Call<List<ProgresoCursoApi>>,
+                response: Response<List<ProgresoCursoApi>>
+            ) {
+                if (response.isSuccessful) {
+                    progresoCursoApi = response.body() ?: emptyList()
+                    fetchCursos(estudianteId)
+                } else {
+                    Log.e("CursosFragment", "Failed to fetch progreso cursos: ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<List<ProgresoCursoApi>>, t: Throwable) {
+                Log.e("CursosFragment", "Error fetching progreso cursos", t)
+            }
+        })
+    }
+
+    private fun fetchCursos(estudianteId: String) {
         showLoadingCursos()
 
-        // Fetch cursos from API
         RetrofitClient.cursoApiService.getCursos().enqueue(object : Callback<List<CursoApi>> {
             override fun onResponse(
                 call: Call<List<CursoApi>>,
@@ -82,6 +113,33 @@ class HomeFragment : Fragment() {
                     val cursos = response.body() ?: emptyList()
                     originalCursos = cursos // Store the original data
                     cursosAdapter.updateData(cursos)
+
+                    if (progresoCursoApi.isEmpty()) {
+                        // Create ProgresoCursoApi for each course
+                        cursos.forEach { curso ->
+                            val progresoCurso = ProgresoCursoApi(
+                                id = UUID.randomUUID(),
+                                idestudiante = UUID.fromString(estudianteId),
+                                idcurso = curso.id,
+                                progreso = 0.0f
+                            )
+                            createProgresoCurso(progresoCurso)
+                        }
+                    } else {
+                        // Check which courses are not in progresoCursoApi
+                        val progresoCursoIds = progresoCursoApi.map { it.idcurso }
+                        cursos.forEach { curso ->
+                            if (!progresoCursoIds.contains(curso.id)) {
+                                val progresoCurso = ProgresoCursoApi(
+                                    id = UUID.randomUUID(),
+                                    idestudiante = UUID.fromString(estudianteId),
+                                    idcurso = curso.id,
+                                    progreso = 0.0f
+                                )
+                                createProgresoCurso(progresoCurso)
+                            }
+                        }
+                    }
                 } else {
                     Log.e("CursosFragment", "Failed to fetch cursos: ${response.errorBody()}")
                 }
@@ -92,8 +150,20 @@ class HomeFragment : Fragment() {
                 Log.e("CursosFragment", "Error fetching cursos", t)
             }
         })
+    }
 
-        return root
+    private fun createProgresoCurso(progresoCurso: ProgresoCursoApi) {
+        RetrofitClient.progresoCursoApiService.createProgresoCurso(progresoCurso).enqueue(object : Callback<ProgresoCursoApi> {
+            override fun onResponse(call: Call<ProgresoCursoApi>, response: Response<ProgresoCursoApi>) {
+                if (!response.isSuccessful) {
+                    Log.e("CursosFragment", "Failed to create progreso curso: ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ProgresoCursoApi>, t: Throwable) {
+                Log.e("CursosFragment", "Error creating progreso curso", t)
+            }
+        })
     }
 
     override fun onDestroyView() {
