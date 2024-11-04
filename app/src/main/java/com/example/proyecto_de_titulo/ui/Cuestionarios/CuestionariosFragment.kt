@@ -2,6 +2,7 @@
 package com.example.proyecto_de_titulo.ui.Cuestionarios
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -284,8 +285,10 @@ class NestedCuestionariosAdapter(
             if (isFavorito) R.drawable.baseline_favorite_24 else R.drawable.baseline_favorite_border_24
         )
 
-        holder.preguntaTextView.setOnClickListener {
-            // Handle click event
+        holder.preguntaTextView.setOnClickListener{
+            val intent = Intent(holder.itemView.context, IntentarCuestionario::class.java)
+            intent.putExtra("idCuestionario", cuestionario.id.toString())
+            holder.itemView.context.startActivity(intent)
         }
 
         holder.guardarFavoritoButton.setOnClickListener {
