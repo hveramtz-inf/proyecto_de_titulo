@@ -7,18 +7,21 @@ import android.os.Parcelable
 data class CuestionarioApi(
     val id: UUID,
     val titulo: String,
-    val idcurso: UUID
+    val idcurso: UUID,
+    val ocultar : Boolean
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
         UUID.fromString(parcel.readString()),
         parcel.readString() ?: "",
-        UUID.fromString(parcel.readString())
+        UUID.fromString(parcel.readString()),
+        parcel.readByte() != 0.toByte()
     )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id.toString())
         parcel.writeString(titulo)
         parcel.writeString(idcurso.toString())
+        parcel.writeByte(if (ocultar) 1 else 0)
     }
 
     override fun describeContents(): Int {

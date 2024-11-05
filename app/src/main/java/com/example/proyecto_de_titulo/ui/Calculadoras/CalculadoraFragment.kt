@@ -34,7 +34,7 @@ class CalculadoraFragment : Fragment() {
     private var _binding: FragmentCalculadorasBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var calculadorasList: List<CalculadoraApi>
+    private var calculadorasList: List<CalculadoraApi> = emptyList() // Initialize with an empty list
     var favoritosCalculadora: List<FavoritosCalculadora> = emptyList() // Initialize with an empty list
 
     override fun onCreateView(
@@ -79,11 +79,13 @@ class CalculadoraFragment : Fragment() {
     }
 
     private fun fetchCalculadoras() {
+        val sharedPreferences = requireContext().getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
+        val clavePucv = sharedPreferences.getString("ClavePucvid", null) ?: return
         val apiService = RetrofitClient.calculadoraApiService
-        apiService.getCalculadoras().enqueue(object : Callback<List<CalculadoraApi>> {
+        apiService.getCalculadorasByClavePucv(clavePucv).enqueue(object : Callback<List<CalculadoraApi>> {
             override fun onResponse(call: Call<List<CalculadoraApi>>, response: Response<List<CalculadoraApi>>) {
                 if (response.isSuccessful) {
-                    calculadorasList = response.body() ?: emptyList()
+                    calculadorasList = response.body()?.filter { !it.ocultar } ?: emptyList() // Filter out calculators with ocultar == true
                     updateCalculadoraList(calculadorasList)
                 } else {
                     Log.e("CalculadoraFragment", "Failed to fetch calculators")

@@ -75,13 +75,14 @@ class HomeFragment : Fragment() {
 
         val sharedPreferences = requireActivity().getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
         val estudianteId = sharedPreferences.getString("IdEstudiante", "0") ?: "0"
+        val clavepucv = sharedPreferences.getString("ClavePucvid", "0") ?: "0"
 
-        obtenerProgesosCursos(estudianteId)
+        obtenerProgesosCursos(estudianteId, clavepucv)
 
         return root
     }
 
-    private fun obtenerProgesosCursos(estudianteId: String) {
+    private fun obtenerProgesosCursos(estudianteId: String, clavepucv: String) {
         RetrofitClient.progresoCursoApiService.getProgresoCursoByEstudiante(estudianteId).enqueue(object : Callback<List<ProgresoCursoApi>> {
             override fun onResponse(
                 call: Call<List<ProgresoCursoApi>>,
@@ -89,7 +90,7 @@ class HomeFragment : Fragment() {
             ) {
                 if (response.isSuccessful) {
                     progresoCursoApi = response.body() ?: emptyList()
-                    fetchCursos(estudianteId)
+                    fetchCursos(estudianteId, clavepucv)
                 } else {
                     Log.e("CursosFragment", "Failed to fetch progreso cursos: ${response.errorBody()}")
                 }
@@ -101,17 +102,17 @@ class HomeFragment : Fragment() {
         })
     }
 
-    private fun fetchCursos(estudianteId: String) {
+    private fun fetchCursos(estudianteId: String, clavepucv: String) {
         showLoadingCursos()
 
-        RetrofitClient.cursoApiService.getCursos().enqueue(object : Callback<List<CursoApi>> {
+        RetrofitClient.cursoApiService.getCursoByClavePucv(clavepucv).enqueue(object : Callback<List<CursoApi>> {
             override fun onResponse(
                 call: Call<List<CursoApi>>,
                 response: Response<List<CursoApi>>
             ) {
                 hideLoadingCursos()
                 if (response.isSuccessful) {
-                    val cursos = response.body() ?: emptyList()
+                    val cursos = response.body()?.filter { !it.ocultar } ?: emptyList() // Filter out courses with ocultar == true
                     originalCursos = cursos // Store the original data
                     cursosAdapter.updateData(cursos)
 

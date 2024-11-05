@@ -30,6 +30,8 @@ import retrofit2.http.Query
 interface CursoApiService {
     @GET("cursos")
     fun getCursos(): Call<List<CursoApi>>
+    @GET("cursos/clavepucv/{clave}")
+    fun getCursoByClavePucv(@Path("clave") clave: String): Call<List<CursoApi>>
 }
 
 interface SeccionApiService {
@@ -67,21 +69,6 @@ interface ApuntesApiService {
 
 
 interface CuestionarioApiService {
-    @GET("cuestionarios/curso/{idcurso}")
-    fun getCuestionarios(@Path("idcurso") idcurso: String): Call<List<CuestionarioApi>>
-
-    @GET("cuestionarios/{id}")
-    fun getCuestionarioById(@Path("id") id: String): Call<CuestionarioApi>
-
-    @POST("cuestionarios")
-    fun createCuestionario(@Body cuestionario: CuestionarioApi): Call<CuestionarioApi>
-
-    @PUT("cuestionarios/{id}")
-    fun updateCuestionario(@Path("id") id: String, @Body cuestionario: CuestionarioApi): Call<CuestionarioApi>
-
-    @DELETE("cuestionarios/{id}")
-    fun deleteCuestionario(@Path("id") id: String): Call<Void>
-
     @GET("cuestionarios/clavepucv/{clavepucv}")
     fun getCuestionariosByClavePucv(@Path("clavepucv") clavePucv: String): Call<List<CuestionarioApi>>
 }
@@ -149,6 +136,9 @@ interface PuntajeAlumnoCuestionarioApiService {
 interface CalculadoraApiService {
     @GET("calculadoras")
     fun getCalculadoras(): Call<List<CalculadoraApi>>
+
+    @GET("calculadoras/clavepucv/{id}")
+    fun getCalculadorasByClavePucv(@Path("id") idClavePucv: String): Call<List<CalculadoraApi>>
 
     @GET("calculadoras/{id}")
     fun getCalculadoraById(@Path("id") id: String): Call<CalculadoraApi>

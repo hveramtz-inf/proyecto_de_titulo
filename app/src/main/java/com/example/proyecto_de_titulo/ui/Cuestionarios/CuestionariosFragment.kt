@@ -115,25 +115,30 @@ class CuestionariosFragment : Fragment() {
     }
 
     private fun obtenerCursos() {
+        val sharedPreferences = requireContext().getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
+        val clavePucv = sharedPreferences.getString("ClavePucvid", null)
+
         val apiService = RetrofitClient.cursoApiService
-        apiService.getCursos().enqueue(object : Callback<List<CursoApi>> {
-            override fun onResponse(call: Call<List<CursoApi>>, response: Response<List<CursoApi>>) {
-                hideLoading()
-                if (response.isSuccessful) {
-                    val cursosList = response.body() ?: emptyList()
-                    cursos.clear()
-                    cursos.addAll(cursosList)
-                    cuestionariosAdapter.updateData(cursos, listaCuestionaros, listaPuntajes, listaFavoritoCuestionarios)
-                } else {
+        if (clavePucv != null) {
+            apiService.getCursoByClavePucv(clavePucv).enqueue(object : Callback<List<CursoApi>> {
+                override fun onResponse(call: Call<List<CursoApi>>, response: Response<List<CursoApi>>) {
+                    hideLoading()
+                    if (response.isSuccessful) {
+                        val cursosList = response.body()?.filter { !it.ocultar } ?: emptyList() // Filter out courses with ocultar == true
+                        cursos.clear()
+                        cursos.addAll(cursosList)
+                        cuestionariosAdapter.updateData(cursos, listaCuestionaros, listaPuntajes, listaFavoritoCuestionarios)
+                    } else {
+                        Toast.makeText(context, "Error loading courses", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+                override fun onFailure(call: Call<List<CursoApi>>, t: Throwable) {
+                    hideLoading()
                     Toast.makeText(context, "Error loading courses", Toast.LENGTH_SHORT).show()
                 }
-            }
-
-            override fun onFailure(call: Call<List<CursoApi>>, t: Throwable) {
-                hideLoading()
-                Toast.makeText(context, "Error loading courses", Toast.LENGTH_SHORT).show()
-            }
-        })
+            })
+        }
     }
 
     private fun obtenerCuestionarios(clavepucvid: String) {
