@@ -146,7 +146,10 @@ class CuestionariosFragment : Fragment() {
         apiService.getCuestionariosByClavePucv(clavepucvid).enqueue(object : Callback<List<CuestionarioApi>> {
             override fun onResponse(call: Call<List<CuestionarioApi>>, response: Response<List<CuestionarioApi>>) {
                 if (response.isSuccessful) {
-                    val cuestionarios = response.body() ?: emptyList()
+                    val cuestionarios = response.body()?.filter { cuestionario ->
+                        val curso = cursos.find { it?.id == cuestionario.idcurso }
+                        curso != null && !curso.ocultar
+                    } ?: emptyList() // Filter out items with ocultar == true
                     listaCuestionaros.clear()
                     listaCuestionaros.addAll(cuestionarios)
                     cuestionariosAdapter.updateData(cursos, listaCuestionaros, listaPuntajes, listaFavoritoCuestionarios)
@@ -178,7 +181,6 @@ class CuestionariosFragment : Fragment() {
                         Toast.makeText(context, "Error loading favoritos", Toast.LENGTH_SHORT).show()
                     }
                 }
-
                 override fun onFailure(call: Call<List<FavoritosCuestionario>>, t: Throwable) {
                     Toast.makeText(context, "Error loading favoritos", Toast.LENGTH_SHORT).show()
                 }
@@ -240,6 +242,7 @@ class CursoAdapter(
             holder.listadoDeCuestionarios.layoutManager = LinearLayoutManager(holder.itemView.context)
             val nestedAdapter = NestedCuestionariosAdapter(cuestionarios, puntajes, favoritosCuestionarios)
             holder.listadoDeCuestionarios.adapter = nestedAdapter
+            holder.listadoDeCuestionarios.layoutManager = LinearLayoutManager(holder.itemView.context, LinearLayoutManager.HORIZONTAL, false)
         }
     }
 
@@ -284,6 +287,7 @@ class NestedCuestionariosAdapter(
         val puntaje = puntajes.find { it.idcuestionario == cuestionario.id }?.puntaje ?: 0f
         holder.progressBar.max = 100
         holder.progressBar.progress = puntaje.toInt()
+
 
         val isFavorito = favoritosCuestionarios.any { it.idcuestionario == cuestionario.id }
         holder.guardarFavoritoButton.setBackgroundResource(

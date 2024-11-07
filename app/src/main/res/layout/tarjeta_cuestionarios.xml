@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:foregroundGravity="center"
+    android:foregroundTint="#F4CCCC">
 
     <LinearLayout
         android:id="@+id/contenedorTarjetCuestionario"
@@ -20,12 +21,16 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/tarjetaCuestionario"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:clickable="false"
+                android:foregroundGravity="fill"
                 app:cardBackgroundColor="#9ED6DF"
-                app:cardCornerRadius="20dp">
+                app:cardCornerRadius="20dp"
+                app:strokeColor="#000000"
+                app:strokeWidth="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -87,11 +92,11 @@
                             android:layout_weight="1"
                             android:background="@color/white"
                             android:indeterminateDrawable="@drawable/redondeo_progresbar"
-                            android:padding="10dp"
-                            android:max="100"/>
+                            android:max="100"
+                            android:padding="10dp" />
                     </LinearLayout>
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
