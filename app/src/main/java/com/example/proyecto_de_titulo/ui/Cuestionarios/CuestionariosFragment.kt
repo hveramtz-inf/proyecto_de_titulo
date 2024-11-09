@@ -238,9 +238,13 @@ class CursoAdapter(
         if (holder is CuestionarioViewHolder) {
             val curso = cursos[position]
             holder.contenedorTituloCuestionario.text = curso?.nombre ?: "Loading..."
-            // Set up the nested RecyclerView for cuestionarios
+
+            // Filter cuestionarios by curso.id
+            val filteredCuestionarios = cuestionarios.filter { it.idcurso == curso?.id }
+
+            // Set up the nested RecyclerView for filtered cuestionarios
             holder.listadoDeCuestionarios.layoutManager = LinearLayoutManager(holder.itemView.context)
-            val nestedAdapter = NestedCuestionariosAdapter(cuestionarios, puntajes, favoritosCuestionarios)
+            val nestedAdapter = NestedCuestionariosAdapter(filteredCuestionarios, puntajes, favoritosCuestionarios)
             holder.listadoDeCuestionarios.adapter = nestedAdapter
             holder.listadoDeCuestionarios.layoutManager = LinearLayoutManager(holder.itemView.context, LinearLayoutManager.HORIZONTAL, false)
         }
