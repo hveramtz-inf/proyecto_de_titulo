@@ -42,6 +42,7 @@ class HistorialCalculadoraFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_historial_calculadora, container, false)
         val recyclerView = view.findViewById<RecyclerView>(R.id.listadoHistorial)
         recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = HistorialCalculadoraAdapter(emptyList(), emptyList())
         return view
     }
 
@@ -65,9 +66,7 @@ class HistorialCalculadoraFragment : Fragment() {
             ) {
                 if (response.isSuccessful) {
                     historial = response.body() ?: emptyList()
-                    historial.forEach { historialItem ->
-                        fetchVariablesForHistorial(historialItem)
-                    }
+                    fetchVariablesForHistorial(historial)
                 } else {
                     Log.e(
                         "HistorialCalculadoraFragment",
@@ -82,37 +81,40 @@ class HistorialCalculadoraFragment : Fragment() {
         })
     }
 
-    private fun fetchVariablesForHistorial(historial: HistorialCalculadoraApi) {
+    private fun fetchVariablesForHistorial(listaHistoriales: List<HistorialCalculadoraApi>) {
         val apiService = RetrofitClient.variableHistorialApiService
-        val call = apiService.getVariableHistorialByHistorial(historial.id.toString())
 
-        call.enqueue(object : Callback<List<VariableHistorialApi>> {
-            override fun onResponse(
-                call: Call<List<VariableHistorialApi>>,
-                response: Response<List<VariableHistorialApi>>
-            ) {
-                if (response.isSuccessful) {
-                    variables = response.body() ?: emptyList()
-                    // Update the RecyclerView adapter
-                    view?.findViewById<RecyclerView>(R.id.listadoHistorial)?.adapter =
-                        HistorialCalculadoraAdapter(historial, variables)
-                } else {
-                    Log.e(
-                        "HistorialCalculadoraFragment",
-                        "Error in response: ${response.errorBody()?.string()}"
-                    )
+        listaHistoriales.forEach { historial ->
+            val call = apiService.getVariableHistorialByHistorial(historial.id.toString())
+
+            call.enqueue(object : Callback<List<VariableHistorialApi>> {
+                override fun onResponse(
+                    call: Call<List<VariableHistorialApi>>,
+                    response: Response<List<VariableHistorialApi>>
+                ) {
+                    if (response.isSuccessful) {
+                        val variables = response.body() ?: emptyList()
+                        // Update the RecyclerView adapter
+                        view?.findViewById<RecyclerView>(R.id.listadoHistorial)?.adapter =
+                            HistorialCalculadoraAdapter(listaHistoriales, variables)
+                    } else {
+                        Log.e(
+                            "HistorialCalculadoraFragment",
+                            "Error in response: ${response.errorBody()?.string()}"
+                        )
+                    }
                 }
-            }
 
-            override fun onFailure(call: Call<List<VariableHistorialApi>>, t: Throwable) {
-                Log.e("HistorialCalculadoraFragment", "Error fetching variables: ${t.message}")
-            }
-        })
+                override fun onFailure(call: Call<List<VariableHistorialApi>>, t: Throwable) {
+                    Log.e("HistorialCalculadoraFragment", "Error fetching variables: ${t.message}")
+                }
+            })
+        }
     }
 }
 
 class HistorialCalculadoraAdapter(
-    private val historial: HistorialCalculadoraApi,
+    private val historialList: List<HistorialCalculadoraApi>,
     private val variables: List<VariableHistorialApi>
 ) : RecyclerView.Adapter<HistorialCalculadoraAdapter.HistorialViewHolder>() {
 
@@ -129,12 +131,13 @@ class HistorialCalculadoraAdapter(
     }
 
     override fun onBindViewHolder(holder: HistorialViewHolder, position: Int) {
-    renderLaTeX(holder, historial.formulalatex)
-    holder.tituloResultado.text = "Resultado: "+historial.resultado.toString()
+        val historial = historialList[position]
+        renderLaTeX(holder, historial.formulalatex)
+        holder.tituloResultado.text = "Resultado: " + historial.resultado.toString()
 
-    val variablesAdapter = VariablesAdapter1(variables)
-    holder.variablesRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context, LinearLayoutManager.HORIZONTAL, false)
-    holder.variablesRecyclerView.adapter = variablesAdapter
+        val variablesAdapter = VariablesAdapter1(variables)
+        holder.variablesRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context, LinearLayoutManager.HORIZONTAL, false)
+        holder.variablesRecyclerView.adapter = variablesAdapter
     }
 
     private fun renderLaTeX(holder: HistorialViewHolder, latex: String) {
@@ -168,7 +171,7 @@ class HistorialCalculadoraAdapter(
         holder.tituloFormulaLatex.loadDataWithBaseURL(null, mathJaxConfig, "text/html", "utf-8", null)
     }
 
-    override fun getItemCount(): Int = 1
+    override fun getItemCount(): Int = historialList.size
 }
 
 class VariablesAdapter1(private val variablesList: List<VariableHistorialApi>) :
