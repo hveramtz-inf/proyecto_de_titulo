@@ -28,252 +28,243 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface CursoApiService {
-    @GET("cursos")
+    @GET("movil/cursos")
     fun getCursos(): Call<List<CursoApi>>
-    @GET("cursos/clavepucv/{clave}")
+    @GET("movil/cursos/clavepucv/{clave}")
     fun getCursoByClavePucv(@Path("clave") clave: String): Call<List<CursoApi>>
 }
 
 interface SeccionApiService {
-    @GET("secciones")
+    @GET("movil/secciones")
     fun getSecciones(): Call<List<SeccionApi>>
 }
 
 interface AlumnoApiService {
-    @POST("/estudiantes/iniciarSesion")
+    @POST("movil/estudiantes/iniciarSesion")
     fun IniciarSesion(@Body loginRequest: LoginRequest): Call<LoginResponse>
 }
 
 interface ApuntesApiService {
-    @GET("apuntes/estudiante/{idestudiante}/seccion/{idseccion}")
+    @GET("movil/apuntes/estudiante/{idestudiante}/seccion/{idseccion}")
     fun getApunte(
         @Path("idestudiante") idEstudiante: String,
         @Path("idseccion") idSeccion: String?
     ): Call<ApuntesApi>
-    // Add other API methods for ApuntesApi here
 
-    @POST("apuntes")
+    @POST("movil/apuntes")
     fun createApunte(@Body reqApuntesApi: ReqCreateApunteApi): Call<ApuntesApi>
 
-    // Actualizar un apunte
-    @PUT("apuntes/{id}")
+    @PUT("movil/apuntes/{id}")
     fun updateApunte(
         @Path("id") id: String,
         @Body reqUpdateApunteApi: reqUpdateApunteApi
     ): Call<ApuntesApi>
 
-    // Eliminar un apunte
-    @DELETE("apuntes/{id}")
+    @DELETE("movil/apuntes/{id}")
     fun deleteApunte(@Path("id") id: String): Call<Void>
 }
 
-
 interface CuestionarioApiService {
-    @GET("cuestionarios/clavepucv/{clavepucv}")
+    @GET("movil/cuestionarios/clavepucv/{clavepucv}")
     fun getCuestionariosByClavePucv(@Path("clavepucv") clavePucv: String): Call<List<CuestionarioApi>>
 }
 
 interface PreguntaApiService {
-    @GET("preguntas")
+    @GET("movil/preguntas")
     fun getPreguntas(): Call<List<PreguntaApi>>
 
-    @GET("preguntas/{id}")
+    @GET("movil/preguntas/{id}")
     fun getPreguntaById(@Path("id") id: String): Call<PreguntaApi>
 
-    @GET("preguntas/cuestionario/{idcuestionario}")
+    @GET("movil/preguntas/cuestionario/{idcuestionario}")
     fun getPreguntasByCuestionario(@Path("idcuestionario") idCuestionario: String): Call<List<PreguntaApi>>
 
-    @POST("preguntas")
+    @POST("movil/preguntas")
     fun createPregunta(@Body pregunta: PreguntaApi): Call<PreguntaApi>
 
-    @PUT("preguntas/{id}")
+    @PUT("movil/preguntas/{id}")
     fun updatePregunta(@Path("id") id: String, @Body pregunta: PreguntaApi): Call<PreguntaApi>
 
-    @DELETE("preguntas/{id}")
+    @DELETE("movil/preguntas/{id}")
     fun deletePregunta(@Path("id") id: String): Call<Void>
 }
 
 interface RespuestaApiService {
-    @GET("respuestas")
+    @GET("movil/respuestas")
     fun getRespuestas(): Call<List<RespuestaApi>>
 
-    @GET("respuestas/{id}")
+    @GET("movil/respuestas/{id}")
     fun getRespuestaById(@Path("id") id: String): Call<RespuestaApi>
 
-    @GET("respuestas/pregunta/{idpregunta}")
+    @GET("movil/respuestas/pregunta/{idpregunta}")
     fun getRespuestasByPregunta(@Path("idpregunta") idPregunta: String): Call<List<RespuestaApi>>
 
-    @POST("respuestas")
+    @POST("movil/respuestas")
     fun createRespuesta(@Body respuesta: RespuestaApi): Call<RespuestaApi>
 
-    @PUT("respuestas/{id}")
+    @PUT("movil/respuestas/{id}")
     fun updateRespuesta(@Path("id") id: String, @Body respuesta: RespuestaApi): Call<RespuestaApi>
 
-    @DELETE("respuestas/{id}")
+    @DELETE("movil/respuestas/{id}")
     fun deleteRespuesta(@Path("id") id: String): Call<Void>
 }
 
 interface PuntajeAlumnoCuestionarioApiService {
-    @GET("puntajeCuestionario")
+    @GET("movil/puntajeCuestionario")
     fun getPuntajes(): Call<List<PuntajeAlumnoCuestionario>>
 
-    @GET("puntajeCuestionario/{id}")
+    @GET("movil/puntajeCuestionario/{id}")
     fun getPuntajeById(@Path("id") id: String): Call<PuntajeAlumnoCuestionario>
 
-    @GET("puntajeCuestionario/estudiante/{idestudiante}")
+    @GET("movil/puntajeCuestionario/estudiante/{idestudiante}")
     fun getPuntajesByEstudiante(@Path("idestudiante") idEstudiante: String): Call<List<PuntajeAlumnoCuestionario>>
 
-    @POST("puntajeCuestionario")
+    @POST("movil/puntajeCuestionario")
     fun createPuntaje(@Body puntaje: PuntajeAlumnoCuestionario): Call<PuntajeAlumnoCuestionario>
 
-    @PUT("puntajeCuestionario/{id}")
+    @PUT("movil/puntajeCuestionario/{id}")
     fun updatePuntaje(@Path("id") id: String, @Body puntaje: PuntajeAlumnoCuestionario): Call<PuntajeAlumnoCuestionario>
 
-    @DELETE("puntajeCuestionario/{id}")
+    @DELETE("movil/puntajeCuestionario/{id}")
     fun deletePuntaje(@Path("id") id: String): Call<Void>
 }
 
 interface CalculadoraApiService {
-    @GET("calculadoras")
+    @GET("movil/calculadoras")
     fun getCalculadoras(): Call<List<CalculadoraApi>>
 
-    @GET("calculadoras/clavepucv/{id}")
+    @GET("movil/calculadoras/clavepucv/{id}")
     fun getCalculadorasByClavePucv(@Path("id") idClavePucv: String): Call<List<CalculadoraApi>>
 
-    @GET("calculadoras/{id}")
+    @GET("movil/calculadoras/{id}")
     fun getCalculadoraById(@Path("id") id: String): Call<CalculadoraApi>
 
-    @POST("calculadoras")
+    @POST("movil/calculadoras")
     fun createCalculadora(@Body calculadora: CalculadoraApi): Call<CalculadoraApi>
 
-    @PUT("calculadoras/{id}")
+    @PUT("movil/calculadoras/{id}")
     fun updateCalculadora(@Path("id") id: String, @Body calculadora: CalculadoraApi): Call<CalculadoraApi>
 
-    @DELETE("calculadoras/{id}")
+    @DELETE("movil/calculadoras/{id}")
     fun deleteCalculadora(@Path("id") id: String): Call<Void>
 }
 
 interface HistorialCalculadoraApiService {
-    @GET("historialCalculadora")
+    @GET("movil/historialCalculadora")
     fun getHistorialCalculadoras(): Call<List<HistorialCalculadoraApi>>
 
-    @GET("historialCalculadora/{id}")
+    @GET("movil/historialCalculadora/{id}")
     fun getHistorialCalculadoraById(@Path("id") id: String): Call<HistorialCalculadoraApi>
 
-    @GET("historialCalculadora/calculadora/{idcalculadora}/estudiante/{idestudiante}")
+    @GET("movil/historialCalculadora/calculadora/{idcalculadora}/estudiante/{idestudiante}")
     fun getHistorialCalculadoraByCalculadoraAndEstudiante(
         @Path("idcalculadora") idCalculadora: String,
         @Path("idestudiante") idEstudiante: String
     ): Call<List<HistorialCalculadoraApi>>
 
-    @POST("historialCalculadora")
+    @POST("movil/historialCalculadora")
     fun createHistorialCalculadora(@Body historialCalculadora: HistorialCalculadoraApi): Call<HistorialCalculadoraApi>
 
-    @PUT("historialCalculadora/{id}")
+    @PUT("movil/historialCalculadora/{id}")
     fun updateHistorialCalculadora(@Path("id") id: String, @Body historialCalculadora: HistorialCalculadoraApi): Call<HistorialCalculadoraApi>
 
-    @DELETE("historialCalculadora/{id}")
+    @DELETE("movil/historialCalculadora/{id}")
     fun deleteHistorialCalculadora(@Path("id") id: String): Call<Void>
 }
 
-interface VariableHistorialApiService
-{
-    @GET("variableHistorial")
+interface VariableHistorialApiService {
+    @GET("movil/variableHistorial")
     fun getVariableHistorial(): Call<List<VariableHistorialApi>>
 
-    @GET("variableHistorial/{id}")
+    @GET("movil/variableHistorial/{id}")
     fun getVariableHistorialById(@Path("id") id: String): Call<VariableHistorialApi>
 
-    @GET("variableHistorial/historial/{idhistorial}")
+    @GET("movil/variableHistorial/historial/{idhistorial}")
     fun getVariableHistorialByHistorial(@Path("idhistorial") idHistorial: String): Call<List<VariableHistorialApi>>
 
-    @POST("variableHistorial")
+    @POST("movil/variableHistorial")
     fun createVariableHistorial(@Body variableHistorial: VariableHistorialApi): Call<VariableHistorialApi>
 
-    @PUT("variableHistorial/{id}")
+    @PUT("movil/variableHistorial/{id}")
     fun updateVariableHistorial(@Path("id") id: String, @Body variableHistorial: VariableHistorialApi): Call<VariableHistorialApi>
 
-    @DELETE("variableHistorial/{id}")
+    @DELETE("movil/variableHistorial/{id}")
     fun deleteVariableHistorial(@Path("id") id: String): Call<Void>
-
 }
 
-
 interface FavoritoCalculadoraApiService {
-    @GET("favoritosCalculadora")
+    @GET("movil/favoritosCalculadora")
     fun getFavoritosCalculadora(): Call<List<FavoritosCalculadora>>
 
-    @GET("favoritosCalculadora/estudiante/{id}")
+    @GET("movil/favoritosCalculadora/estudiante/{id}")
     fun getFavoritosCalculadoraByEstudiante(@Path("id") idEstudiante: String): Call<List<FavoritosCalculadora>>
 
-    @GET("favoritosCalculadora/{id}")
+    @GET("movil/favoritosCalculadora/{id}")
     fun getFavoritoCalculadoraById(@Path("id") id: String): Call<FavoritosCalculadora>
 
-    @POST("favoritosCalculadora")
+    @POST("movil/favoritosCalculadora")
     fun createFavoritoCalculadora(@Body favoritoCalculadora: FavoritosCalculadora): Call<FavoritosCalculadora>
 
-    @DELETE("favoritosCalculadora/{id}")
+    @DELETE("movil/favoritosCalculadora/{id}")
     fun deleteFavoritoCalculadora(@Path("id") id: String): Call<Void>
 }
 
-
 interface FavoritoCuestionarioApiService {
-    @GET("favoritosCuestionario")
+    @GET("movil/favoritosCuestionario")
     fun getFavoritosCuestionario(): Call<List<FavoritosCuestionario>>
 
-    @GET("favoritosCuestionario/{id}")
+    @GET("movil/favoritosCuestionario/{id}")
     fun getFavoritoCuestionarioById(@Path("id") id: String): Call<FavoritosCuestionario>
 
-    @GET("favoritosCuestionario/estudiante/{id}")
+    @GET("movil/favoritosCuestionario/estudiante/{id}")
     fun getFavoritosCuestionarioByEstudiante(@Path("id") idEstudiante: String): Call<List<FavoritosCuestionario>>
 
-    @POST("favoritosCuestionario")
+    @POST("movil/favoritosCuestionario")
     fun createFavoritoCuestionario(@Body favoritoCuestionario: FavoritosCuestionario): Call<FavoritosCuestionario>
 
-    @DELETE("favoritosCuestionario/{id}")
+    @DELETE("movil/favoritosCuestionario/{id}")
     fun deleteFavoritoCuestionario(@Path("id") id: String): Call<Void>
 }
 
-
 interface ProgresoCursoApiService {
-    @GET("progresoCurso")
+    @GET("movil/progresoCurso")
     fun getProgresoCurso(): Call<List<ProgresoCursoApi>>
 
-    @GET("progresoCurso/{id}")
+    @GET("movil/progresoCurso/{id}")
     fun getProgresoCursoById(@Path("id") id: String): Call<ProgresoCursoApi>
 
-    @GET("progresoCurso/estudiante/{id}")
+    @GET("movil/progresoCurso/estudiante/{id}")
     fun getProgresoCursoByEstudiante(@Path("id") id: String): Call<List<ProgresoCursoApi>>
 
-    @POST("progresoCurso")
+    @POST("movil/progresoCurso")
     fun createProgresoCurso(@Body progresoCurso: ProgresoCursoApi): Call<ProgresoCursoApi>
 
-    @PUT("progresoCurso/{id}")
+    @PUT("movil/progresoCurso/{id}")
     fun updateProgresoCurso(@Path("id") id: String, @Body progresoCurso: ProgresoCursoApi): Call<ProgresoCursoApi>
 
-    @DELETE("progresoCurso/{id}")
+    @DELETE("movil/progresoCurso/{id}")
     fun deleteProgresoCurso(@Path("id") id: String): Call<Void>
 }
 
 interface SeccionRevisadaApiService {
-    @GET("seccionRevisada")
+    @GET("movil/seccionRevisada")
     fun getSeccionesRevisadas(): Call<List<SeccionRevisadaApi>>
 
-    @GET("seccionRevisada/{id}")
+    @GET("movil/seccionRevisada/{id}")
     fun getSeccionRevisadaById(@Path("id") id: String): Call<SeccionRevisadaApi>
 
-    @GET("seccionRevisada/estudiante/{id}/seccion/{idseccion}")
+    @GET("movil/seccionRevisada/estudiante/{id}/seccion/{idseccion}")
     fun getSeccionRevisadaByEstudianteAndSeccion(
         @Path("id") idEstudiante: String,
         @Path("idseccion") idSeccion: String
     ): Call<List<SeccionRevisadaApi>>
 
-    @POST("seccionRevisada")
+    @POST("movil/seccionRevisada")
     fun createSeccionRevisada(@Body seccionRevisada: SeccionRevisadaApi): Call<SeccionRevisadaApi>
 
-    @PUT("seccionRevisada/{id}")
+    @PUT("movil/seccionRevisada/{id}")
     fun updateSeccionRevisada(@Path("id") id: String, @Body seccionRevisada: SeccionRevisadaApi): Call<SeccionRevisadaApi>
 
-    @DELETE("seccionRevisada/{id}")
+    @DELETE("movil/seccionRevisada/{id}")
     fun deleteSeccionRevisada(@Path("id") id: String): Call<Void>
 }

@@ -1,4 +1,3 @@
-// RetrofitClient.kt
 package com.example.proyecto_de_titulo.interfazApiRest
 
 import retrofit2.Retrofit
@@ -7,7 +6,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 
 object RetrofitClient {
-    private const val BASE_URL = "https://easy-economy.fly.dev/movil/"
+    private const val BASE_URL = "https://easy-economy.fly.dev/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -84,5 +83,4 @@ object RetrofitClient {
     val seccionRevisadaApiService: SeccionRevisadaApiService by lazy {
         retrofit.create(SeccionRevisadaApiService::class.java)
     }
-
 }
