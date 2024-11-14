@@ -3,10 +3,12 @@ package com.example.proyecto_de_titulo
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +17,7 @@ import com.example.proyecto_de_titulo.dataApiRest.LoginResponse
 import com.example.proyecto_de_titulo.interfazApiRest.RetrofitClient
 import retrofit2.Call
 import retrofit2.Response
+import android.widget.TextView
 
 class inicia_sesion : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,6 +27,8 @@ class inicia_sesion : AppCompatActivity() {
         val inputRut = findViewById<EditText>(R.id.inputRut)
         val inputContrasenia = findViewById<EditText>(R.id.inputContrasenia)
         val iniciarSesionBoton = findViewById<Button>(R.id.iniciarSesionBoton)
+        val indicadorInicioSesion = findViewById<TextView>(R.id.indicadorInicioSesion)
+
         inputRut.addTextChangedListener(object : TextWatcher {
             private var isFormatting: Boolean = false
             private var isDeleting: Boolean = false
@@ -44,16 +49,23 @@ class inicia_sesion : AppCompatActivity() {
                 isFormatting = false
             }
         })
+
         iniciarSesionBoton.setOnClickListener {
             val rut = inputRut.text.toString()
             val contrasenia = inputContrasenia.text.toString()
 
+            indicadorInicioSesion.text = "Cargando"
+            indicadorInicioSesion.visibility = View.VISIBLE
+
             validarCredenciales(rut, contrasenia) { isValid ->
                 if (isValid) {
+                    indicadorInicioSesion.text = "Inicio correcto"
+                    indicadorInicioSesion.setTextColor(Color.GREEN)
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
                 } else {
-                    // Handle invalid credentials
+                    indicadorInicioSesion.text = "Rut o contraseña erróneo"
+                    indicadorInicioSesion.setTextColor(Color.RED)
                 }
             }
         }
@@ -73,6 +85,7 @@ class inicia_sesion : AppCompatActivity() {
 
         return sb.toString()
     }
+
     private fun validarCredenciales(rut: String, contrasenia: String, callback: (Boolean) -> Unit) {
         val apiService = RetrofitClient.alumnoApiService
         val loginRequest = LoginRequest(rut, contrasenia)
@@ -98,7 +111,7 @@ class inicia_sesion : AppCompatActivity() {
         })
     }
 
-       private fun guardarCredenciales(loginResponse: LoginResponse) {
+    private fun guardarCredenciales(loginResponse: LoginResponse) {
         val sharedPreferences: SharedPreferences = getSharedPreferences("Credenciales", Context.MODE_PRIVATE)
         val editor: SharedPreferences.Editor = sharedPreferences.edit()
         editor.putString("RUT", loginResponse.rut)
