@@ -7,30 +7,38 @@
 Este proyecto es una aplicación móvil desarrollada en Kotlin para la gestión de cursos, cuestionarios y calculadoras. La aplicación permite a los usuarios acceder a diferentes cursos, realizar cuestionarios y utilizar diversas calculadoras.
 
 ## Requisitos Funcionales
-1. El estudiante debe poder iniciar sesión en la aplicación con sus credenciales de la PUCV.
-2. El sistema debe mostrar una lista de cursos disponibles.
-3. El sistema deberá mostrar en la barra de progreso del curso el progreso que tiene el alumno.
-4. El estudiante podrá buscar el curso de mayor interés que contenga alguna palabra en su título.
-5. El estudiante podrá ver las secciones del curso seleccionado.
-6. El estudiante podrá reproducir videos de YouTube en caso de que el docente los proporcione en los datos de la sección.
-7. El estudiante podrá crear, editar y eliminar apuntes de la sección seleccionada.
-8. El sistema debe guardar el progreso del curso al ingresar a una sección relacionada.
-9. El sistema debe mostrar todos los cuestionarios con sus relaciones a los cursos al estudiante.
-10. El estudiante podrá buscar el cuestionario de mayor interés según alguna palabra que contenga el cuestionario.
-11. El estudiante podrá guardar/eliminar en favoritos el cuestionario de mayor interés.
-12. El estudiante podrá intentar los cuestionarios del curso relacionado.
-13. El estudiante podrá salir del intento del cuestionario.
-14. Al finalizar el cuestionario, el estudiante verá la pregunta con su respuesta seleccionada acompañada de un color que identifique si es correcta o no.
-15. El sistema debe guardar el puntaje obtenido del estudiante solo si no existe un puntaje o es mayor al que ya obtuvo anteriormente.
-16. El sistema debe mostrar las calculadoras disponibles.
-17. El estudiante podrá buscar la calculadora que contenga una palabra de su interés.
-18. El sistema debe mostrar la fórmula en formato LaTeX.
-19. El estudiante debe seleccionar la calculadora que le interese.
-20. El estudiante debe completar los campos necesarios para que la calculadora funcione.
-21. El sistema debe mostrar el cambio de los valores en la fórmula junto con el resultado.
-22. El sistema debe guardar en el historial las variables y sus valores junto con el resultado obtenido por el estudiante.
-23. El estudiante solo podrá almacenar un máximo de 5 historiales por calculadora.
-24. El estudiante podrá guardar/eliminar de su lista de favoritos la calculadora que desee.
+
+### 1.0 Autenticación
+1.1 El estudiante debe poder iniciar sesión en la aplicación con sus credenciales de la PUCV.
+
+### 2.0 Cursos
+2.1 El sistema debe mostrar una lista de cursos disponibles.
+2.2 El sistema deberá mostrar en la barra de progreso del curso el progreso que tiene el alumno.
+2.3 El estudiante podrá buscar el curso de mayor interés que contenga alguna palabra en su título.
+2.4 El estudiante podrá ver las secciones del curso seleccionado.
+2.5 El estudiante podrá reproducir videos de YouTube en caso de que el docente los proporcione en los datos de la sección.
+2.6 El estudiante podrá crear, editar y eliminar apuntes de la sección seleccionada.
+2.7 El sistema debe guardar el progreso del curso al ingresar a una sección relacionada.
+
+### 3.0 Cuestionarios
+3.1 El sistema debe mostrar todos los cuestionarios con sus relaciones a los cursos al estudiante.
+3.2 El estudiante podrá buscar el cuestionario de mayor interés según alguna palabra que contenga el cuestionario.
+3.3 El estudiante podrá guardar/eliminar en favoritos el cuestionario de mayor interés.
+3.4 El estudiante podrá intentar los cuestionarios del curso relacionado.
+3.5 El estudiante podrá salir del intento del cuestionario.
+3.6 Al finalizar el cuestionario, el estudiante verá la pregunta con su respuesta seleccionada acompañada de un color que identifique si es correcta o no.
+3.7 El sistema debe guardar el puntaje obtenido del estudiante solo si no existe un puntaje o es mayor al que ya obtuvo anteriormente.
+
+### 4.0 Calculadoras
+4.1 El sistema debe mostrar las calculadoras disponibles.
+4.2 El estudiante podrá buscar la calculadora que contenga una palabra de su interés.
+4.3 El sistema debe mostrar la fórmula en formato LaTeX.
+4.4 El estudiante debe seleccionar la calculadora que le interese.
+4.5 El estudiante debe completar los campos necesarios para que la calculadora funcione.
+4.6 El sistema debe mostrar el cambio de los valores en la fórmula junto con el resultado.
+4.7 El sistema debe guardar en el historial las variables y sus valores junto con el resultado obtenido por el estudiante.
+4.8 El estudiante solo podrá almacenar un máximo de 5 historiales por calculadora.
+4.9 El estudiante podrá guardar/eliminar de su lista de favoritos la calculadora que desee.
 
 ## Requisitos No Funcionales
 1. La aplicación debe ser compatible con dispositivos Android.
