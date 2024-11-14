@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.TextView
@@ -53,13 +54,13 @@ class IntentarCuestionario : AppCompatActivity() {
         obtenerPreguntasYRespuestas(idCuestionario)
 
         botonSiguiente.setOnClickListener {
-            if (preguntaActual < preguntas.size - 1) {
-                guardarRespuestaSeleccionada()
-                preguntaActual++
-                mostrarPregunta()
-            } else {
-                guardarRespuestaSeleccionada()
-                enviarRespuestasAFinalizarCuestionario(idCuestionario)
+            if (guardarRespuestaSeleccionada()) {
+                if (preguntaActual < preguntas.size - 1) {
+                    preguntaActual++
+                    mostrarPregunta()
+                } else {
+                    enviarRespuestasAFinalizarCuestionario(idCuestionario)
+                }
             }
         }
 
@@ -126,18 +127,30 @@ class IntentarCuestionario : AppCompatActivity() {
         }
     }
 
-    private fun guardarRespuestaSeleccionada() {
+    private fun guardarRespuestaSeleccionada(): Boolean {
         val pregunta = preguntas[preguntaActual]
-        val respuestaSeleccionada = (recyclerView.adapter as RespuestasAdapter).getSelectedRespuesta()
-        if (respuestaSeleccionada != null) {
+        val respuestasSeleccionadas = (recyclerView.adapter as RespuestasAdapter).getSelectedRespuestas()
+        if (respuestasSeleccionadas.isEmpty()) {
+            Toast.makeText(this, "Debe seleccionar al menos una alternativa", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        val respuestasCorrectas = respuestas.filter { it.idpregunta == pregunta.id && it.valor }
+        val todasCorrectas = respuestasSeleccionadas.size == respuestasCorrectas.size &&
+                             respuestasSeleccionadas.all { it in respuestasCorrectas }
+
+        respuestasSeleccionadas.forEach { respuestaSeleccionada ->
             val respuestaEstudiante = PreguntayRespuestaSeleccionadaEstudiante(
                 pregunta = pregunta.pregunta,
                 respuesta = respuestaSeleccionada.respuesta,
-                valor = respuestaSeleccionada.valor
+                valor = todasCorrectas
             )
-            respuestasSeleccionadas.add(respuestaEstudiante)
+            this.respuestasSeleccionadas.add(respuestaEstudiante)
         }
+
+        return true
     }
+
 
     private fun enviarRespuestasAFinalizarCuestionario(idCuestionario: String) {
         val intent = Intent(this, FinalizarCuestionario::class.java)
@@ -148,10 +161,10 @@ class IntentarCuestionario : AppCompatActivity() {
 }
 
 class RespuestasAdapter(private val respuestas: List<RespuestaApi>) : RecyclerView.Adapter<RespuestasAdapter.ViewHolder>() {
-    private var selectedPosition = -1
+    private val selectedPositions = mutableSetOf<Int>()
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val respuesta: RadioButton = view.findViewById(R.id.alternativa)
+        val respuesta: CheckBox = view.findViewById(R.id.alternativa)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -159,19 +172,22 @@ class RespuestasAdapter(private val respuestas: List<RespuestaApi>) : RecyclerVi
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, @SuppressLint("RecyclerView") position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.respuesta.text = respuestas[position].respuesta
-        holder.respuesta.isChecked = position == selectedPosition
+        holder.respuesta.isChecked = selectedPositions.contains(position)
 
         holder.respuesta.setOnClickListener {
-            selectedPosition = position
-            notifyDataSetChanged()
+            if (holder.respuesta.isChecked) {
+                selectedPositions.add(position)
+            } else {
+                selectedPositions.remove(position)
+            }
         }
     }
 
     override fun getItemCount(): Int = respuestas.size
 
-    fun getSelectedRespuesta(): RespuestaApi? {
-        return if (selectedPosition != -1) respuestas[selectedPosition] else null
+    fun getSelectedRespuestas(): List<RespuestaApi> {
+        return selectedPositions.map { respuestas[it] }
     }
 }

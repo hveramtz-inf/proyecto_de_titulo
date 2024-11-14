@@ -59,6 +59,7 @@ class FinalizarCuestionario : AppCompatActivity() {
         botonFinalizarRevisionCuestionario.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
+            finish()
         }
     }
 
@@ -72,7 +73,7 @@ class FinalizarCuestionario : AppCompatActivity() {
 
                     if (puntajeExistente != null) {
                         if (porcentajeRespuestasCorrectas > puntajeExistente.puntaje && puntajeExistente.puntaje.toInt() != 100) {
-                            actualizarPuntaje(puntajeExistente.id.toString(), idCuestionario, porcentajeRespuestasCorrectas)
+                            actualizarPuntaje(puntajeExistente.id.toString(),idEstudiante, idCuestionario, porcentajeRespuestasCorrectas)
                         }
                     } else {
                         crearNuevoPuntaje(idEstudiante, idCuestionario, porcentajeRespuestasCorrectas)
@@ -88,11 +89,11 @@ class FinalizarCuestionario : AppCompatActivity() {
         })
     }
 
-        private fun actualizarPuntaje(idPuntaje: String, idCuestionario: String, nuevoPuntaje: Float) {
+        private fun actualizarPuntaje(idPuntaje: String,idEstudiante: String, idCuestionario: String, nuevoPuntaje: Float) {
         val apiService = RetrofitClient.puntajeAlumnoCuestionarioApiService
         val puntajeActualizado = PuntajeAlumnoCuestionario(
             UUID.fromString(idPuntaje),
-            UUID.randomUUID(), // Asumiendo que este es el id del estudiante
+            UUID.fromString(idEstudiante), // Asumiendo que este es el id del estudiante
             UUID.fromString(idCuestionario),
             nuevoPuntaje
         )
@@ -137,21 +138,11 @@ class FinalizarCuestionario : AppCompatActivity() {
     }
 }
 
-fun calcularPorcentajeRespuestasCorrectas(preguntayrespuestas: List<PreguntayRespuestaSeleccionadaEstudiante>): Float {
-    var respuestasCorrectas = 0
-
-    for (preguntaRespuesta in preguntayrespuestas) {
-        if (preguntaRespuesta.valor) {
-            respuestasCorrectas++
-        }
+    fun calcularPorcentajeRespuestasCorrectas(preguntayrespuestas: List<PreguntayRespuestaSeleccionadaEstudiante>): Float {
+        val numeroRespuestasCorrectas = preguntayrespuestas.count { it.valor }
+        val totalPreguntas = preguntayrespuestas.size
+        return (numeroRespuestasCorrectas.toFloat() / totalPreguntas.toFloat()) * 100
     }
-
-    return if (preguntayrespuestas.isNotEmpty()) {
-        (respuestasCorrectas.toFloat() / preguntayrespuestas.size) * 100
-    } else {
-        0f
-    }
-}
 
 class ListadoPreguntayRespuestaAdapter(
     private val preguntayrespuestas: List<PreguntayRespuestaSeleccionadaEstudiante>
