@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-11-09T14:00:34.614862900Z">
+        <DropdownSelection timestamp="2024-11-09T21:56:10.089580900Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\hvera\.android\avd\Pixel_7_API_30.avd" />

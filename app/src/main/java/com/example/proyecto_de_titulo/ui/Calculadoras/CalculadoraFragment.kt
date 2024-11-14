@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.widget.Button
 import android.widget.EditText
@@ -213,31 +214,36 @@ class CalculadoraAdapter(
     private fun renderLaTeX(holder: ViewHolder, latex: String) {
         Log.d("Latex", latex)
         val mathJaxConfig = """
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-            <script type="text/javascript" async
-                src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
-            </script>
-            <script type="text/x-mathjax-config">
-                MathJax.Hub.Config({
-                    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
-                    "HTML-CSS": { scale: 150, linebreaks: { automatic: true } },
-                    SVG: { scale: 150, linebreaks: { automatic: true } }
-                });
-            </script>
-        </head>
-        <body style="margin: 0px; padding-left: 30px; padding-right: 0px ; display: flex; justify-content: center; align-items: center; height: 100vh;">
-            <div id="math-content" style="text-align: center;">
-                $$ $latex $$
-            </div>
-        </body>
-        </html>
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+                <script type="text/javascript" async
+                    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+                </script>
+                <script type="text/x-mathjax-config">
+                    MathJax.Hub.Config({
+                        tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+                        "HTML-CSS": { scale: 90, linebreaks: { automatic: true } },
+                        SVG: { scale: 90, linebreaks: { automatic: true } }
+                    });
+                </script>
+            </head>
+            <body style="margin: 0px; padding: 5px; display: block; justify-content: center; align-items: center; height: 100%; width:100%; overflow: scroll;">
+                <div id="math-content" style="text-align:  inline-block; padding: 0 10px; overflow-wrap: break-word; word-break: break-all;">
+                    $$ $latex $$
+                </div>
+            </body>
+            </html>
         """.trimIndent()
+
 
         holder.FormulaWebView.settings.javaScriptEnabled = true
         holder.FormulaWebView.settings.loadWithOverviewMode = true
         holder.FormulaWebView.settings.useWideViewPort = true
+        holder.FormulaWebView.settings.setSupportZoom(true)
+        holder.FormulaWebView.settings.builtInZoomControls = true
+        holder.FormulaWebView.settings.displayZoomControls = false
+        holder.FormulaWebView.settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
         holder.FormulaWebView.loadDataWithBaseURL(null, mathJaxConfig, "text/html", "utf-8", null)
     }
 

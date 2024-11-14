@@ -157,7 +157,7 @@ class UsarCalculadoraFragment : Fragment() {
                 });
             </script>
         </head>
-        <body style="display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+        <body style="display:block; justify-content: center; align-items: center; height: 100vh; margin: 0;">
             <div id="math-content" style="text-align: center;">
                 $$ $latex $$
             </div>
@@ -172,7 +172,7 @@ class UsarCalculadoraFragment : Fragment() {
     }
 
     private fun extraerVariablesDeFormula(formula: String): List<String> {
-        val regex = Regex("\\b[a-zA-Z_]+\\b")
+        val regex = Regex("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
         val rightHandSide = formula.split("=").last().trim()
         return regex.findAll(rightHandSide).map { it.value }.distinct().toList()
     }
