@@ -61,4 +61,6 @@ Para acceder a la aplicación, los usuarios deben utilizar sus credenciales de l
 - RUT: 123456789.
 - Contraseña: contrasenia123.
 
-En caso de problemas con las credenciales, los usuarios deben contactar al soporte técnico de la PUCV para obtener asistencia.
+## Error comunes en ejecutar la Aplicacion
+Un error comun al manejar varias librerias en el gradebuild para el funcionamientos de distintas caracteristicas de la aplicaciones es que aparezca el error en build.gradle
+para solucionar esto solo se debe seleccionar la opcion "Build" de la interfaz de android studio un seleccionar "Rebuild Project" esperar que la construccion se haga correctamente y iniciar de nuevo.
