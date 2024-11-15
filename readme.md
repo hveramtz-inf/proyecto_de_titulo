@@ -22,12 +22,13 @@ Este proyecto es una aplicación móvil desarrollada en Kotlin para la gestión 
 
 ### 3.0 Cuestionarios
 3.1 El sistema debe mostrar todos los cuestionarios con sus relaciones a los cursos al estudiante.
-3.2 El estudiante podrá buscar el cuestionario de mayor interés según alguna palabra que contenga el cuestionario.
-3.3 El estudiante podrá guardar/eliminar en favoritos el cuestionario de mayor interés.
-3.4 El estudiante podrá intentar los cuestionarios del curso relacionado.
-3.5 El estudiante podrá salir del intento del cuestionario.
-3.6 Al finalizar el cuestionario, el estudiante verá la pregunta con su respuesta seleccionada acompañada de un color que identifique si es correcta o no.
-3.7 El sistema debe guardar el puntaje obtenido del estudiante solo si no existe un puntaje o es mayor al que ya obtuvo anteriormente.
+3.2 El sistema debe mostrar en la barra de progreso el puntaje obtenido por el estudiante en el cuestionario del 0 a 100.
+3.3 El estudiante podrá buscar el cuestionario de mayor interés según alguna palabra que contenga el cuestionario.
+3.4 El estudiante podrá guardar/eliminar en favoritos el cuestionario de mayor interés.
+3.5 El estudiante podrá intentar los cuestionarios del curso relacionado.
+3.6 El estudiante podrá salir del intento del cuestionario sin guardar su progeso.
+3.7 Al finalizar el cuestionario, el estudiante verá la pregunta con su respuesta seleccionada acompañada de un color que identifique si es correcta o no.
+3.8 El sistema debe guardar el puntaje obtenido del estudiante solo si no existe un puntaje o es mayor al que ya obtuvo anteriormente.
 
 ### 4.0 Calculadoras
 4.1 El sistema debe mostrar las calculadoras disponibles.
@@ -39,6 +40,11 @@ Este proyecto es una aplicación móvil desarrollada en Kotlin para la gestión 
 4.7 El sistema debe guardar en el historial las variables y sus valores junto con el resultado obtenido por el estudiante.
 4.8 El estudiante solo podrá almacenar un máximo de 5 historiales por calculadora.
 4.9 El estudiante podrá guardar/eliminar de su lista de favoritos la calculadora que desee.
+
+### 5.0 Historial Calculadora
+5.1 El sistema debe mostrar el historial de cálculos realizados por el estudiante.
+5.2 El sistema debe mostrar las variables y sus valores ingresados por el estudiante en cada cálculo.
+5.3 El sistema debe mostrar el resultado obtenido en cada cálculo.
 
 ## Requisitos No Funcionales
 1. La aplicación debe ser compatible con dispositivos Android.
